@@ -14,12 +14,12 @@
 
 ---
 
-## **[ Revision history ]**
+## [ Revision history ]
 
 | Revision date | Version # | Description | Author |
-|---|---:|---|---|
+| --- | --- | --- | --- |
 | 03/27/2026 | 1.00 | First draft | 황선영 |
-
+| 05/08/2026 | 1.01 | Use case list 및 Concept of operation 일부 수정 | 황선영 |
 ---
 
 ## **= Contents =**
@@ -72,138 +72,155 @@
 
 ---
 
-# **3. Use case list**
+# 3. Use case list
 
-## **1) Upload File**
-
-| Actor | User |
-|---|---|
-| Description | 사용자가 업로드할 파일을 선택하여 시스템에 전송한다. |
-
-## **2) Validate File Extension**
-
-| Actor | System |
-|---|---|
-| Description | 업로드된 파일의 확장자를 검사하여 허용된 형식인지 확인한다. |
-
-## **3) Verify File Type**
-
-| Actor | System |
-|---|---|
-| Description | 파일의 실제 형식(MIME 타입)을 확인하여 확장자와 일치하는지 검사한다. |
-
-## **4) Analyze File Safety**
-
-| Actor | System |
-|---|---|
-| Description | 파일의 확장자와 형식 정보를 기반으로 안전 여부를 판단한다. |
-
-## **5) Determine File Status**
-
-| Actor | System |
-|---|---|
-| Description | 파일을 안전 또는 위험 상태로 구분한다. |
-
-## **6) Display Result and Warning**
+## 1) User Sign Up
 
 | Actor | User |
-|---|---|
-| Description | 사용자가 파일 검사 결과를 확인하며, 위험한 경우 경고 메시지를 함께 제공받는다. |
+| --- | --- |
+| Description | 사용자가 시스템 계정을 생성한다. |
 
-## **7) Store Analysis Result**
+## 2) User Login
 
-| Actor | System |
-|---|---|
-| Description | 파일 검사 결과 및 관련 정보를 저장한다. |
+| Actor | User |
+| --- | --- |
+| Description | 사용자가 시스템에 로그인한다. |
 
-## **8) View Logs**
+## 3) Upload File
 
-| Actor | Admin |
-|---|---|
-| Description | 관리자가 저장된 검사 로그를 조회한다. |
+| Actor | User |
+| --- | --- |
+| Description | 사용자가 검사할 파일을 업로드한다. |
 
-## **9) Manage File Policy**
+## 4) View Upload Result
 
-| Actor | Admin |
-|---|---|
-| Description | 관리자가 허용 및 제한 파일 형식을 설정한다. |
+| Actor | User |
+| --- | --- |
+| Description | 업로드된 파일의 검사 결과(SAFE / WARNING / BLOCKED 및 위험도)를 확인한다. |
+
+## 5) Check Blocking Reason
+
+| Actor | User |
+| --- | --- |
+| Description | 차단된 파일의 차단 사유를 확인한다. |
+
+## 6) View Upload History
+
+| Actor | User |
+| --- | --- |
+| Description | 사용자가 자신의 업로드 기록을 조회한다. |
+
+## 7) Check Upload Policy
+
+| Actor | User |
+| --- | --- |
+| Description | 파일 허용/차단 정책 및 위험 기준을 확인한다. |
+
+## 8) View Security Alert
+
+| Actor | User |
+| --- | --- |
+| Description | 위험 파일 탐지 시 보안 경고 메시지를 확인한다. |
+
+## 9) Delete Upload History
+
+| Actor | User |
+| --- | --- |
+| Description | 사용자가 업로드 기록을 삭제한다. |
 
 ---
 
-# **4. Concept of operation**
+# 4. Concept of operation
 
-## **1) Upload File**
+---
+
+## 1) User Sign Up
+
+| Purpose | 사용자가 시스템 계정을 생성할 수 있도록 한다. |
+| --- | --- |
+| Approach | 사용자가 이메일, 아이디, 비밀번호 정보를 입력하면 시스템이 입력값을 검증한 후 계정을 생성한다. 중복 아이디 여부를 확인하고 성공 시 회원가입을 완료한다. |
+| Dynamics | 회원가입 요청 시 |
+| Goals | 사용자 계정 생성 기능 구현 |
+
+---
+
+## 2) User Login
+
+| Purpose | 사용자가 시스템에 로그인할 수 있도록 한다. |
+| --- | --- |
+| Approach | 사용자가 입력한 아이디와 비밀번호를 서버에서 검증하여 인증 성공 시 세션을 생성하고 메인 화면으로 이동한다. 실패 시 오류 메시지를 반환한다. |
+| Dynamics | 로그인 요청 시 |
+| Goals | 사용자 인증 기능 구현 |
+
+---
+
+## 3) Upload File
 
 | Purpose | 사용자가 파일을 시스템에 업로드할 수 있도록 한다. |
-|---|---|
-| Approach | 사용자가 업로드할 파일을 선택한 후 업로드 요청을 보내면, 시스템은 해당 파일을 입력 데이터로 받아 처리 준비를 한다. 이 과정에서 파일 이름, 크기 등의 기본 정보도 함께 수집된다. |
+| --- | --- |
+| Approach | 사용자가 파일을 선택하여 업로드하면 시스템이 파일을 서버로 전송하고 기본 정보(이름, 크기, 타입)를 수집한다. 이후 보안 검사 단계로 전달된다. |
 | Dynamics | 파일 업로드 시 |
 | Goals | 파일 업로드 기능 구현 |
 
-## **2) Validate File Extension**
+---
 
-| Purpose | 허용되지 않은 확장자를 사전에 확인하기 위함이다. |
-|---|---|
-| Approach | 업로드된 파일의 확장자를 추출한 뒤, 시스템에 미리 정의된 허용 목록 또는 제한 목록과 비교하여 검사한다. 이 과정에서 단순 문자열 비교 방식으로 빠르게 처리하여 초기 단계에서 위험 요소를 걸러낸다. |
-| Dynamics | 파일 업로드 직후 |
-| Goals | 확장자 기반 1차 검사 수행 |
+## 4) View Upload Result
 
-## **3) Verify File Type**
-
-| Purpose | 확장자를 변경한 위장 파일을 탐지하기 위함이다. |
-|---|---|
-| Approach | 파일의 MIME 타입을 확인하여 실제 파일 형식을 분석한다. 이후 파일의 확장자와 비교하여 서로 일치하는지 확인하며, 불일치할 경우 비정상 파일로 판단한다. 이 과정을 통해 단순 확장자 검사에서 놓칠 수 있는 위험 요소를 보완한다. |
-| Dynamics | 확장자 검사 이후 |
-| Goals | 파일 형식 검증 |
-
-## **4) Analyze File Safety**
-
-| Purpose | 파일의 전체적인 안전 여부를 판단하기 위함이다. |
-|---|---|
-| Approach | 확장자 검사와 파일 형식 검사 결과를 종합하여 파일의 위험 가능성을 분석한다. 단순히 하나의 조건이 아니라 여러 검사 결과를 기준으로 판단하도록 하여 보다 신뢰성 있는 결과를 도출한다. |
-| Dynamics | 검사 과정 중 |
-| Goals | 파일 안전성 분석 |
-
-## **5) Determine File Status**
-
-| Purpose | 분석 결과를 사용자에게 명확하게 전달하기 위함이다. |
-|---|---|
-| Approach | 이전 단계에서 수행된 검사 결과를 기반으로 파일을 안전 또는 위험 상태로 구분한다. 판단 기준은 사전에 정의된 정책을 따르며, 결과는 일관된 기준으로 처리된다. |
-| Dynamics | 분석 완료 후 |
-| Goals | 상태 결정 |
-
-## **6) Display Result and Warning**
-
-| Purpose | 사용자에게 검사 결과를 직관적으로 제공하기 위함이다. |
-|---|---|
-| Approach | 파일이 안전한 경우 정상 메시지를 출력하고, 위험한 경우에는 경고 메시지를 함께 표시한다. 사용자가 결과를 쉽게 이해할 수 있도록 간단한 메시지 형태로 제공한다. |
+| Purpose | 업로드된 파일의 검사 결과를 사용자에게 제공한다. |
+| --- | --- |
+| Approach | 시스템이 검사 결과(SAFE / WARNING / BLOCKED)와 위험도(LOW / MEDIUM / HIGH)를 조회하여 사용자에게 출력한다. |
 | Dynamics | 검사 완료 후 |
-| Goals | 사용자 피드백 제공 |
+| Goals | 검사 결과 제공 기능 구현 |
 
-## **7) Store Analysis Result**
+---
 
-| Purpose | 검사 결과를 기록하여 추후 활용하기 위함이다. |
-|---|---|
-| Approach | 파일 이름, 검사 시간, 결과 상태 등의 정보를 데이터베이스 또는 로그 형태로 저장한다. 저장된 데이터는 이후 관리자 조회나 분석에 활용될 수 있다. |
-| Dynamics | 검사 완료 후 |
-| Goals | 로그 저장 |
+## 5) Check Blocking Reason
 
-## **8) View Logs**
+| Purpose | 차단된 파일의 이유를 사용자에게 제공한다. |
+| --- | --- |
+| Approach | 파일이 BLOCKED 상태일 경우 확장자, MIME 타입 불일치, 정책 위반 여부 등의 차단 사유를 조회하여 출력한다. |
+| Dynamics | 차단 파일 조회 시 |
+| Goals | 차단 사유 제공 기능 구현 |
 
-| Purpose | 관리자가 시스템 상태를 확인할 수 있도록 한다. |
-|---|---|
-| Approach | 저장된 로그 데이터를 조회하여 파일 업로드 이력과 검사 결과를 확인한다. 이를 통해 시스템의 동작 상태를 파악할 수 있다. |
-| Dynamics | 관리자 요청 시 |
-| Goals | 로그 조회 기능 구현 |
+---
 
-## **9) Manage File Policy**
+## 6) View Upload History
 
-| Purpose | 시스템의 검사 기준을 관리하기 위함이다. |
-|---|---|
-| Approach | 관리자가 허용할 파일 형식과 제한할 확장자를 설정할 수 있도록 하여 시스템의 보안 정책을 유연하게 조정할 수 있도록 한다. |
-| Dynamics | 관리자 설정 시 |
-| Goals | 정책 관리 기능 구현 |
+| Purpose | 사용자가 업로드 이력을 확인할 수 있도록 한다. |
+| --- | --- |
+| Approach | 시스템이 사용자 기준으로 업로드된 파일 목록과 검사 결과를 조회하여 출력한다. |
+| Dynamics | 기록 조회 요청 시 |
+| Goals | 업로드 기록 조회 기능 구현 |
 
+---
+
+## 7) Check Upload Policy
+
+| Purpose | 파일 보안 정책을 사용자에게 제공한다. |
+| --- | --- |
+| Approach | 허용 확장자, 차단 확장자, 위험도 기준 등을 조회하여 사용자에게 출력한다. |
+| Dynamics | 정책 조회 시 |
+| Goals | 보안 정책 조회 기능 구현 |
+
+---
+
+## 8) View Security Alert
+
+| Purpose | 위험 파일 탐지 시 경고 메시지를 제공한다. |
+| --- | --- |
+| Approach | 시스템이 위험 파일을 탐지하면 경고 메시지와 함께 업로드 제한 안내를 사용자에게 출력한다. |
+| Dynamics | 위험 파일 탐지 시 |
+| Goals | 보안 경고 기능 구현 |
+
+---
+
+## 9) Delete Upload History
+
+| Purpose | 사용자가 업로드 기록을 삭제할 수 있도록 한다. |
+| --- | --- |
+| Approach | 사용자가 선택한 업로드 기록을 시스템에서 삭제하고 결과를 반환한다. 삭제 실패 시 오류 메시지를 출력한다. |
+| Dynamics | 삭제 요청 시 |
+| Goals | 기록 삭제 기능 구현 |
 ---
 
 # **5. Problem statement**
