@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFILE - Upload File</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dashboard-body">
+
+    <div class="dashboard-layout max-w-4xl">
+        <div class="dashboard-header">
+            <h1>Upload File</h1>
+            <p>Upload files for security scanning and validation</p>
+        </div>
+
+        <div class="upload-main-card">
+            <div id="drop-zone" class="drop-zone-area">
+                <input type="file" id="file-upload-input" class="hidden-file-input">
+                
+                <div class="drop-zone-content">
+                    <div class="upload-icon-circle">
+                        <i class="fa-solid fa-cloud-arrow-up text-blue"></i>
+                    </div>
+                    <div>
+                        <p class="upload-prompt-text">
+                            Drop your file here, or <label for="file-upload-input" class="browse-link">browse</label>
+                        </p>
+                        <p class="upload-limit-text">Maximum file size: 50MB</p>
+                    </div>
+
+                    <div class="supported-types-container">
+                        <div class="supported-title">Supported File Types</div>
+                        <div class="types-tag-flex">
+                            <span class="type-badge">PDF</span>
+                            <span class="type-badge">DOCX</span>
+                            <span class="type-badge">XLSX</span>
+                            <span class="type-badge">PPTX</span>
+                            <span class="type-badge">PNG</span>
+                            <span class="type-badge">JPG</span>
+                            <span class="type-badge">ZIP</span>
+                            <span class="type-badge">TXT</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="preview-zone" class="preview-zone-area hidden">
+                <div class="file-preview-row">
+                    <div class="preview-file-icon">
+                        <i class="fa-regular fa-file-lines text-blue"></i>
+                    </div>
+                    <div class="preview-file-details">
+                        <div id="preview-filename" class="preview-filename-text">filename.pdf</div>
+                        <div id="preview-filesize" class="preview-filesize-text">0 Bytes</div>
+                    </div>
+                    <button type="button" id="remove-file-btn" class="remove-file-action">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div id="progress-container" class="progress-bar-container hidden">
+                    <div class="progress-status-text">
+                        <span>Uploading and scanning...</span>
+                        <span id="progress-percent" class="text-blue">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="progress-fill" class="progress-fill-bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <button type="button" id="start-upload-btn" class="primary-scan-button">
+                    <i class="fa-solid fa-shield-halved"></i> Upload and Scan
+                </button>
+            </div>
+        </div>
+
+        <div class="info-split-grid">
+            <div class="info-card-item">
+                <div class="info-icon-wrapper green-bg"><i class="fa-solid fa-circle-check text-green"></i></div>
+                <div class="info-card-text">
+                    <h3>Secure Upload</h3>
+                    <p>All files are encrypted during transfer and storage</p>
+                </div>
+            </div>
+            <div class="info-card-item">
+                <div class="info-icon-wrapper blue-bg"><i class="fa-solid fa-circle-info text-blue"></i></div>
+                <div class="info-card-text">
+                    <h3>Instant Scanning</h3>
+                    <p>Files are scanned for malware and policy violations in real-time</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="requirements-three-grid">
+            <div class="req-card">
+                <div class="req-title-row">
+                    <div class="icon-mini-box blue-bg"><i class="fa-regular fa-file-pdf text-blue"></i></div>
+                    <h3>Documents</h3>
+                </div>
+                <p class="req-sub">Supported formats:</p>
+                <p class="req-formats">PDF, DOCX, XLSX, PPTX, TXT</p>
+            </div>
+            <div class="req-card">
+                <div class="req-title-row">
+                    <div class="icon-mini-box purple-bg"><i class="fa-regular fa-image text-purple"></i></div>
+                    <h3>Images</h3>
+                </div>
+                <p class="req-sub">Supported formats:</p>
+                <p class="req-formats">PNG, JPG, JPEG, GIF, SVG</p>
+            </div>
+            <div class="req-card">
+                <div class="req-title-row">
+                    <div class="icon-mini-box green-bg"><i class="fa-regular fa-file-zipper text-green"></i></div>
+                    <h3>Archives</h3>
+                </div>
+                <p class="req-sub">Supported formats:</p>
+                <p class="req-formats">ZIP, RAR (max 50MB)</p>
+            </div>
+        </div>
+
+        <div class="blocked-alert-banner">
+            <div class="banner-flex-layout">
+                <div class="banner-icon-box red-banner-icon"><i class="fa-solid fa-triangle-exclamation text-red"></i></div>
+                <div class="banner-content-text">
+                    <h3>Blocked File Types</h3>
+                    <p>The following file types are automatically blocked for security reasons:</p>
+                    <div class="blocked-tags-flex">
+                        <span class="blocked-tag">.exe</span>
+                        <span class="blocked-tag">.bat</span>
+                        <span class="blocked-tag">.cmd</span>
+                        <span class="blocked-tag">.msi</span>
+                        <span class="blocked-tag">.ps1</span>
+                        <span class="blocked-tag">.vbs</span>
+                        <span class="blocked-tag">.dll</span>
+                        <span class="blocked-tag">.sys</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="upload-main-card">
+            <div class="checks-header">
+                <i class="fa-solid fa-shield-circle-check text-blue"></i>
+                <h2>Security Checks Performed</h2>
+            </div>
+            <div class="checks-grid-list">
+                <div class="check-item-line"><i class="fa-solid fa-circle-check text-green"></i> <span>Malware Scanning</span></div>
+                <div class="check-item-line"><i class="fa-solid fa-circle-check text-green"></i> <span>File Type Validation</span></div>
+                <div class="check-item-line"><i class="fa-solid fa-circle-check text-green"></i> <span>Size Limit Check (Max 50MB)</span></div>
+                <div class="check-item-line"><i class="fa-solid fa-circle-check text-green"></i> <span>Content Analysis</span></div>
+                <div class="check-item-line"><i class="fa-solid fa-circle-check text-green"></i> <span>Double Extension Detection</span></div>
+                <div class="check-item-line"><i class="fa-solid fa-circle-check text-green"></i> <span>MIME Type Verification</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="security-modal" class="modal-overlay-bg hidden">
+        <div class="modal-card-box">
+            <div class="modal-alert-header">
+                <div class="modal-alert-icon-circle"><i class="fa-solid fa-radiation text-red"></i></div>
+                <h2>Security Incident Alert</h2>
+            </div>
+            <div class="modal-body-content">
+                <div class="alert-badge-critical">SEVERITY: HIGH</div>
+                <p class="alert-desc-text">An unallowed malicious executable file upload attempt was intercepted by the central system firewall policy rules.</p>
+                
+                <div class="alert-details-table">
+                    <div class="detail-row"><strong>Filename:</strong> <span id="modal-filename-text" class="text-red">unknown.exe</span></div>
+                    <div class="detail-row"><strong>Threat Type:</strong> <span>Executable file blocked by security policy</span></div>
+                    <div class="detail-row"><strong>Action Taken:</strong> <span class="text-red">Upload Denied & Blocked</span></div>
+                </div>
+            </div>
+            <div class="modal-footer-action">
+                <button type="button" id="close-modal-btn" class="modal-close-button">Acknowledge & Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-upload-input');
+        const previewZone = document.getElementById('preview-zone');
+        const previewFilename = document.getElementById('preview-filename');
+        const previewFilesize = document.getElementById('preview-filesize');
+        const removeFileBtn = document.getElementById('remove-file-btn');
+        const startUploadBtn = document.getElementById('start-upload-btn');
+        const progressContainer = document.getElementById('progress-container');
+        const progressFill = document.getElementById('progress-fill');
+        const progressPercent = document.getElementById('progress-percent');
+        
+        const securityModal = document.getElementById('security-modal');
+        const modalFilenameText = document.getElementById('modal-filename-text');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        let targetFile = null;
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-active');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-active');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                handleFileSelection(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files.length > 0) {
+                handleFileSelection(fileInput.files[0]);
+            }
+        });
+
+        function handleFileSelection(file) {
+            const dangerousExtensions = [".exe", ".bat", ".cmd", ".msi", ".ps1", ".vbs", ".dll", ".sys"];
+            const filename = file.name;
+            const ext = filename.substring(filename.lastIndexOf(".")).toLowerCase();
+
+            // 만약 프론트 단에서 악성 파일 업로드를 시도한 경우, 모달을 띄우고 서버에 BLOCKED 기록을 남기도록 유도
+            if (dangerousExtensions.includes(ext)) {
+                modalFilenameText.textContent = filename;
+                securityModal.classList.remove('hidden');
+                
+                // 프론트 차단 기록도 DB에 남기기 위해 서버로 데이터 전송 처리
+                sendBlockLogToDatabase(filename);
+                resetUploadState();
+                return;
+            }
+
+            targetFile = file;
+            previewFilename.textContent = file.name;
+            previewFilesize.textContent = formatFileSize(file.size);
+
+            dropZone.classList.add('hidden');
+            previewZone.classList.remove('hidden');
+        }
+
+        // 프론트 차단 시 백엔드 DB로 즉시 차단 기록 전송 함수
+        function sendBlockLogToDatabase(filename) {
+            const formData = new FormData();
+            formData.append('filename_only', filename);
+            fetch('/upload', { method: 'POST', body: formData });
+        }
+
+        // 🌟 [핵심 변경 및 연동]: 스캔 애니메이션 후 데이터 전송 처리
+        startUploadBtn.addEventListener('click', () => {
+            if (!targetFile) return;
+
+            startUploadBtn.classList.add('hidden');
+            removeFileBtn.classList.add('hidden');
+            progressContainer.classList.remove('hidden');
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressFill.style.width = progress + '%';
+                progressPercent.textContent = progress + '%';
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    
+                    // 비동기 폼 데이터 생성 후 백엔드로 진짜 파일 전송
+                    const formData = new FormData();
+                    formData.append('file', targetFile);
+
+                    fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // 백엔드가 돌려준 결과값(status, risk 등)을 세션 스토리지에 임시 백업 후 결과창으로 이동
+                        sessionStorage.setItem('last_scan_result', JSON.stringify(data));
+                        window.location.href = '/result';
+                    })
+                    .catch(error => {
+                        alert("서버 통신 실패");
+                        resetUploadState();
+                    });
+                }
+            }, 150);
+        });
+
+        removeFileBtn.addEventListener('click', resetUploadState);
+        closeModalBtn.addEventListener('click', () => {
+            securityModal.classList.add('hidden');
+        });
+
+        function resetUploadState() {
+            targetFile = null;
+            fileInput.value = '';
+            dropZone.classList.remove('hidden');
+            previewZone.classList.add('hidden');
+            progressContainer.classList.add('hidden');
+            startUploadBtn.classList.remove('hidden');
+            removeFileBtn.classList.remove('hidden');
+            progressFill.style.width = '0%';
+            progressPercent.textContent = '0%';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>

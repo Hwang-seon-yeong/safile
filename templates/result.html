@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFILE - Scan Result</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* 결과창 가독성 확보를 위한 간이 컨테이너 보정 */
+        .result-wrapper {
+            max-width: 500px;
+            margin: 4rem auto;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+        }
+        .result-title { font-size: 1.5rem; color: #ffffff; margin-bottom: 1.5rem; font-weight: 700; }
+        .result-info-box { text-align: left; background: #0b0f19; padding: 1.25rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid #1e293b; }
+        .result-line { margin-bottom: 0.75rem; font-size: 0.95rem; color: #e2e8f0; }
+        .result-line strong { color: #94a3b8; display: inline-block; width: 100px; }
+        .btn-back { background-color: #2563eb; color: #ffffff; border: none; padding: 0.65rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; width: 100%; transition: background 0.2s; }
+        .btn-back:hover { background-color: #1d4ed8; }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="result-wrapper">
+        <h2 class="result-title"><i class="fa-solid fa-shield-halved text-blue"></i> Security Scan Result</h2>
+        
+        <div class="result-info-box">
+            <div class="result-line"><strong>Filename:</strong> <span id="res-filename" style="color: #ffffff;">-</span></div>
+            <div class="result-line"><strong>Status:</strong> <span id="res-status" class="font-bold-500">-</span></div>
+            <div class="result-line"><strong>Risk Level:</strong> <span id="res-risk" class="font-bold-500">-</span></div>
+            <div class="result-line"><strong>Reason:</strong> <span id="res-reason" style="color: #cbd5e1;">-</span></div>
+        </div>
+
+        <button class="btn-back" onclick="location.href='/dashboard'">Return to Dashboard</button>
+    </div>
+
+    <script>
+        // 세션스토리지에 저장되어 넘어온 최신 검사 데이터 바인딩
+        const resultData = JSON.parse(sessionStorage.getItem('last_scan_result'));
+        
+        if (resultData) {
+            document.getElementById('res-filename').textContent = resultData.filename;
+            document.getElementById('res-status').textContent = resultData.status;
+            document.getElementById('res-risk').textContent = resultData.risk;
+            document.getElementById('res-reason').textContent = resultData.reason;
+
+            // 결과 등급에 맞는 선명한 배지 색상 매핑
+            const statusEl = document.getElementById('res-status');
+            const riskEl = document.getElementById('res-risk');
+
+            if (resultData.status === 'SAFE') {
+                statusEl.style.color = '#4ade80';
+                riskEl.style.color = '#4ade80';
+            } else if (resultData.status === 'WARNING') {
+                statusEl.style.color = '#facc15';
+                riskEl.style.color = '#facc15';
+            } else {
+                statusEl.style.color = '#f87171';
+                riskEl.style.color = '#f87171';
+            }
+        }
+    </script>
+</body>
+</html>

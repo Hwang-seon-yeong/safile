@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFILE - Sign In</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-full-page">
+
+    <div class="login-container-box">
+        <div class="login-header-zone">
+            <div class="login-logo-circle">
+                <i class="fa-solid fa-shield-halved text-blue"></i>
+            </div>
+            <h1>SAFILE</h1>
+            <p>Sign in to your account</p>
+        </div>
+
+        <div class="login-card-main">
+            <form id="login-form" action="/" method="POST" class="login-space-y">
+                
+                {% if error %}
+                <div class="login-error-banner">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>{{ error }}</span>
+                </div>
+                {% endif %}
+
+                <div id="error-message-box" class="login-error-banner hidden">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="error-text-content">Please fill in all fields</span>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="email" class="input-label-text">Email Address</label>
+                    <div class="input-with-icon-relative">
+                        <i class="fa-regular fa-envelope input-left-icon"></i>
+                        <input 
+                            id="email" 
+                            name="username"
+                            type="email" 
+                            class="login-input-control" 
+                            placeholder="you@example.com"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="password" class="input-label-text">Password</label>
+                    <div class="input-with-icon-relative">
+                        <i class="fa-solid fa-lock input-left-icon"></i>
+                        <input 
+                            id="password" 
+                            name="password"
+                            type="password" 
+                            class="login-input-control" 
+                            placeholder="••••••••"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" class="login-submit-button">Sign In</button>
+
+                <div class="login-footer-switch">
+                    Don't have an account? 
+                    <a href="/signup" class="switch-link-text">Sign Up</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="login-security-notice">
+            <p>Protected by enterprise-grade encryption</p>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorBox = document.getElementById('error-message-box');
+        const errorText = document.getElementById('error-text-content');
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // 일단 자바스크립트 검사를 위해 기본 전송 막음
+
+            const emailValue = emailInput.value.trim();
+            const passwordValue = passwordInput.value.trim();
+
+            if (!emailValue || !passwordValue) {
+                errorText.textContent = "Please fill in all fields";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            errorBox.classList.add('hidden');
+            // 🌟 자바스크립트 검증 성공 시, 이제 실제로 파이썬 서버로 제출(Submit) 실행
+            loginForm.submit(); 
+        });
+    </script>
+</body>
+</html>

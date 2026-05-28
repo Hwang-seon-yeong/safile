@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFILE - Create Account</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-full-page">
+
+    <div class="login-container-box">
+        <div class="login-header-zone">
+            <div class="login-logo-circle">
+                <i class="fa-solid fa-shield-halved text-blue"></i>
+            </div>
+            <h1>SAFILE</h1>
+            <p>Join our secure platform</p>
+        </div>
+
+        <div class="login-card-main">
+            <form id="signup-form" action="/signup" method="POST" class="signup-space-y">
+                
+                {% if error %}
+                <div class="login-error-banner">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>{{ error }}</span>
+                </div>
+                {% endif %}
+
+                <div id="signup-error-box" class="login-error-banner hidden">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="signup-error-text">Please fill in all fields</span>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="name" class="input-label-text">Full Name</label>
+                    <div class="input-with-icon-relative">
+                        <i class="fa-regular fa-user input-left-icon"></i>
+                        <input 
+                            id="name" 
+                            type="text" 
+                            class="login-input-control" 
+                            placeholder="John Doe"
+                        >
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="email" class="input-label-text">Email Address</label>
+                    <div class="input-with-icon-relative">
+                        <i class="fa-regular fa-envelope input-left-icon"></i>
+                        <input 
+                            id="email" 
+                            name="username"
+                            type="email" 
+                            class="login-input-control" 
+                            placeholder="you@example.com"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="password" class="input-label-text">Password</label>
+                    <div class="input-with-icon-relative">
+                        <i class="fa-solid fa-lock input-left-icon"></i>
+                        <input 
+                            id="password" 
+                            name="password"
+                            type="password" 
+                            class="login-input-control" 
+                            placeholder="••••••••"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="confirmPassword" class="input-label-text">Confirm Password</label>
+                    <div class="input-with-icon-relative">
+                        <i class="fa-solid fa-lock input-left-icon"></i>
+                        <input 
+                            id="confirmPassword" 
+                            type="password" 
+                            class="login-input-control" 
+                            placeholder="••••••••"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" class="login-submit-button">Create Account</button>
+
+                <div class="login-footer-switch">
+                    Already have an account? 
+                    <a href="/" class="switch-link-text">Sign In</a> </div>
+            </form>
+        </div>
+
+        <div class="login-security-notice">
+            <p>Your data is encrypted and secure</p>
+        </div>
+    </div>
+
+    <script>
+        const signupForm = document.getElementById('signup-form');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        
+        const errorBox = document.getElementById('signup-error-box');
+        const errorText = document.getElementById('signup-error-text');
+
+        const inputs = [nameInput, emailInput, passwordInput, confirmPasswordInput];
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                errorBox.classList.add('hidden');
+            });
+        });
+
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // 프론트 검증을 위해 잠시 대기
+
+            const nameValue = nameInput.value.trim();
+            const emailValue = emailInput.value.trim();
+            const passwordValue = passwordInput.value.trim();
+            const confirmPasswordValue = confirmPasswordInput.value.trim();
+
+            if (!nameValue || !emailValue || !passwordValue || !confirmPasswordValue) {
+                errorText.textContent = "Please fill in all fields";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            if (passwordValue !== confirmPasswordValue) {
+                errorText.textContent = "Passwords do not match";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            if (passwordValue.length < 8) {
+                errorText.textContent = "Password must be at least 8 characters";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            errorBox.classList.add('hidden');
+            // 🌟 모든 규칙을 통과했으므로 진짜 파이썬 DB 서버로 회원정보 인서트 제출
+            signupForm.submit(); 
+        });
+    </script>
+</body>
+</html>

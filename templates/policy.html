@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFILE - Security Policy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dashboard-body">
+
+    <div class="dashboard-layout max-w-4xl">
+        <div class="policy-top-flex">
+            <div>
+                <h1>Security Policy</h1>
+                <p class="text-slate-400">Review and understand the security policies protecting your uploads</p>
+            </div>
+        </div>
+
+        <div class="policy-dashboard-grid">
+            <div class="policy-stat-card">
+                <div class="stat-top-row">
+                    <span class="stat-label">Total Scans Today</span>
+                    <span class="stat-change text-green">+12%</span>
+                </div>
+                <div class="stat-value">1,284</div>
+            </div>
+            <div class="stat-card policy-stat-card">
+                <div class="stat-top-row">
+                    <span class="stat-label">Threats Blocked</span>
+                    <span class="stat-change text-red">-3%</span>
+                </div>
+                <div class="stat-value">87</div>
+            </div>
+            <div class="stat-card policy-stat-card">
+                <div class="stat-top-row">
+                    <span class="stat-label">Policy Violations</span>
+                    <span class="stat-change text-green">+8%</span>
+                </div>
+                <div class="stat-value">124</div>
+            </div>
+            <div class="stat-card policy-stat-card">
+                <div class="stat-top-row">
+                    <span class="stat-label">System Uptime</span>
+                    <span class="stat-change text-muted">0%</span>
+                </div>
+                <div class="stat-value">99.9%</div>
+            </div>
+        </div>
+
+        <div class="policy-wrapper-box">
+            <div class="card-section-title">
+                <i class="fa-solid fa-shield-halved text-blue"></i>
+                <h2 class="inline-title-h2">Security Features</h2>
+            </div>
+            <div class="features-split-grid">
+                <div class="feature-item-box">
+                    <div class="feature-icon-circle blue-bg"><i class="fa-solid fa-expand text-blue"></i></div>
+                    <div>
+                        <div class="feature-item-title">Real-time Scanning</div>
+                        <div class="feature-item-desc">All uploads are scanned immediately upon receipt</div>
+                    </div>
+                </div>
+                <div class="feature-item-box">
+                    <div class="feature-icon-circle blue-bg"><i class="fa-solid fa-lock text-blue"></i></div>
+                    <div>
+                        <div class="feature-item-title">Encrypted Storage</div>
+                        <div class="feature-item-desc">Files are encrypted at rest using AES-256</div>
+                    </div>
+                </div>
+                <div class="feature-item-box">
+                    <div class="feature-icon-circle blue-bg"><i class="fa-solid fa-database text-blue"></i></div>
+                    <div>
+                        <div class="feature-item-title">Threat Database</div>
+                        <div class="feature-item-desc">Updated daily with latest malware signatures</div>
+                    </div>
+                </div>
+                <div class="feature-item-box">
+                    <div class="feature-icon-circle blue-bg"><i class="fa-solid fa-shield-halved text-blue"></i></div>
+                    <div>
+                        <div class="feature-item-title">Automatic Quarantine</div>
+                        <div class="feature-item-desc">Suspicious files are isolated automatically</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="active-policies-zone">
+            <h2 class="zone-main-title">Active Security Policies</h2>
+
+            <div class="policy-wrapper-box">
+                <div class="policy-card-top">
+                    <div class="policy-title-flex">
+                        <div class="policy-avatar blue-bg"><i class="fa-regular fa-file-excel text-blue"></i></div>
+                        <div>
+                            <h3>File Type Restrictions <span class="badge-active">Active</span></h3>
+                            <p class="policy-card-desc">Blocks executable and potentially dangerous file types</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="policy-rules-list">
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Executable files (.exe, .bat, .cmd, .msi)</span></div><span class="tag-badge-block">BLOCK</span></div>
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Script files (.ps1, .vbs, .js with node shebang)</span></div><span class="tag-badge-block">BLOCK</span></div>
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>System files (.dll, .sys, .drv)</span></div><span class="tag-badge-block">BLOCK</span></div>
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-check text-green"></i><span>Document files (.pdf, .docx, .xlsx, .pptx)</span></div><span class="tag-badge-allow">ALLOW</span></div>
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-check text-green"></i><span>Image files (.jpg, .png, .gif, .svg)</span></div><span class="tag-badge-allow">ALLOW</span></div>
+                </div>
+            </div>
+
+            <div class="policy-wrapper-box">
+                <div class="policy-card-top">
+                    <div class="policy-title-flex">
+                        <div class="policy-avatar red-bg"><i class="fa-solid fa-triangle-exclamation text-red"></i></div>
+                        <div>
+                            <h3>Malware Detection <span class="badge-active">Active</span></h3>
+                            <p class="policy-card-desc">Scans files for known malware signatures and suspicious patterns</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="policy-rules-list">
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Files matching known malware signatures</span></div><span class="tag-badge-block">BLOCK</span></div>
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Files with suspicious code patterns</span></div><span class="tag-badge-block">BLOCK</span></div>
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-solid fa-triangle-exclamation text-yellow"></i><span>Files with embedded macros</span></div><span class="tag-badge-warning">WARNING</span></div>
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-solid fa-triangle-exclamation text-yellow"></i><span>Password-protected archives</span></div><span class="tag-badge-warning">WARNING</span></div>
+                </div>
+            </div>
+
+            <div class="policy-wrapper-box">
+                <div class="policy-card-top">
+                    <div class="policy-title-flex">
+                        <div class="policy-avatar yellow-bg"><i class="fa-solid fa-database text-yellow"></i></div>
+                        <div>
+                            <h3>File Size Limits <span class="badge-active">Active</span></h3>
+                            <p class="policy-card-desc">Enforces maximum file size restrictions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="policy-rules-list">
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Files larger than 50MB are rejected</span></div><span class="tag-badge-block">BLOCK</span></div>
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-solid fa-triangle-exclamation text-yellow"></i><span>Files larger than 20MB trigger warnings</span></div><span class="tag-badge-warning">WARNING</span></div>
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-check text-green"></i><span>Files under 20MB are processed normally</span></div><span class="tag-badge-allow">ALLOW</span></div>
+                </div>
+            </div>
+
+            <div class="policy-wrapper-box">
+                <div class="policy-card-top">
+                    <div class="policy-title-flex">
+                        <div class="policy-avatar green-bg"><i class="fa-regular fa-circle-check text-green"></i></div>
+                        <div>
+                            <h3>Content Validation <span class="badge-active">Active</span></h3>
+                            <p class="policy-card-desc">Validates file contents match declared file types</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="policy-rules-list">
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Files with mismatched content and extension</span></div><span class="tag-badge-block">BLOCK</span></div>
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Files attempting to disguise their true type</span></div><span class="tag-badge-block">BLOCK</span></div>
+                    <div class="rule-row-item"><div class="rule-left"><i class="fa-solid fa-triangle-exclamation text-yellow"></i><span>Files with unusual metadata</span></div><span class="tag-badge-warning">WARNING</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="policy-guide-banner">
+            <div class="guide-flex-box">
+                <div class="guide-icon-box"><i class="fa-solid fa-triangle-exclamation text-blue"></i></div>
+                <div class="guide-content-area">
+                    <h3>Best Practices</h3>
+                    <ul>
+                        <li>Only upload files from trusted sources</li>
+                        <li>Scan files with your local antivirus before uploading</li>
+                        <li>Avoid uploading password-protected archives when possible</li>
+                        <li>Review warnings carefully before proceeding with flagged files</li>
+                        <li>Report false positives to help improve our detection systems</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="policy-wrapper-box">
+            <h2 class="compliance-title">Compliance & Standards</h2>
+            <div class="compliance-three-grid">
+                <div class="compliance-item">
+                    <div class="comp-name">ISO 27001</div>
+                    <div class="comp-desc">Information security management</div>
+                </div>
+                <div class="compliance-item">
+                    <div class="comp-name">SOC 2 Type II</div>
+                    <div class="comp-desc">Security and availability controls</div>
+                </div>
+                <div class="compliance-item">
+                    <div class="comp-name">GDPR Compliant</div>
+                    <div class="comp-desc">Data protection and privacy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
