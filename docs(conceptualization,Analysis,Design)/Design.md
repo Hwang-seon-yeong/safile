@@ -44,7 +44,7 @@ Safile은 Flask 기반 웹 애플리케이션으로 구현되며, 로그인 시�
 # 2. Class Diagram
 
 <p align="center">
-  <img src="./images/class.png" width="100%">
+  <img src="/images/class.png" width="100%">
 </p>
 
 ## 1) AuthenticationService
@@ -283,7 +283,7 @@ FileDeletion은 업로드 기록 삭제 기능을 담당하는 클래스이다. 
 ## 2. User Login Process
 
 <p align="center">
-  <img src="./images/s2.png" width="100%">
+  <img src="/images/s2.png" width="100%">
 </p>
 
 * **설명**: 사용자가 인증을 요청하면 `AuthenticationService`는 사용자 정보를 조회하여 유효성을 검증합니다.
