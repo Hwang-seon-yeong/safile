@@ -20,7 +20,7 @@
 | Revision date | Version # | Description | Author |
 | --- | --- | --- | --- |
 | 2026.05.08 | 1.0.0 | First Draft |  |
-|  |  |  |  |
+| 2026.06.05 | 1.0.1 |  클래스 오타 수정|  |
 |  |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
@@ -550,6 +550,15 @@ FileFilter 클래스는 업로드 결과를 조건별로 필터링하는 기능�
 
 사용자는 SAFE, WARNING, BLOCKED 상태 또는 위험도 기준으로 결과를 조회할 수 있으며, 조건에 맞는 결과만 출력한다.
 
+---
+## 7) SecurityScanService
+SecurityScanService 클래스는 파일의 확장자 및 이중 확장자 패턴을 정밀 검사하여 보안 위험도를 평가하는 기능을 담당하는 클래스이다.
+입력받은 파일명과 보안 정책(SecurityPolicy)을 비교하여, 위협 요소 발견 시 상태(SAFE, WARNING, BLOCKED)와 위험 수준을 포함한 ScanResult 객체를 생성한다.
+
+--- 
+## 8) FileFilter
+FileFilter 클래스는 업로드 결과를 조건별로 필터링하는 기능을 제공하는 클래스이다.
+사용자는 SAFE, WARNING, BLOCKED 상태 또는 위험도 기준으로 결과를 조회할 수 있으며, 조건에 맞는 결과만 출력한다.
 ---
 
 ## 9) HistorySearch

@@ -13,7 +13,7 @@
 </div>
 
 ---
-# Analysis
+# Design
 
 ### [ Revision history ]
 
@@ -250,7 +250,7 @@ FileDeletion은 업로드 기록 삭제 기능을 담당하는 클래스이다. 
 
 ---
 
-# Class Relationship Summary
+### Class Relationship Summary
 
 - AuthenticationService는 User 객체를 생성하고 인증한다.
 - FileUpload는 업로드된 파일 정보를 저장하며 SecurityScanService에 전달된다.
@@ -260,112 +260,88 @@ FileDeletion은 업로드 기록 삭제 기능을 담당하는 클래스이다. 
 - 검사 결과는 UploadRecord에 저장된다.
 - HistorySearch는 UploadRecord를 조회 및 검색한다.
 - FileFilter는 UploadRecord를 상태별로 필터링한다.
-- FileDeletion은 UploadRecord를 삭제한다.
+- FileDeletion은 UploadRecord를 삭제한다.  
+  
+
+
 
 ---
 
 # 3. Sequence Diagram
 
-## 1. User Registration Process
+## 1. User Signup Process
 
 <p align="center">
-  <img src="시퀀스1.png" width="100%">
+  <img src="./images/s1.png" width="100%">
 </p>
 
-### Description
-
-사용자가 회원가입 요청을 보내면 AuthenticationService가 Database를 조회하여 ID 중복 여부를 확인한다.
-
-### Core Logic
-
-ID가 존재하지 않을 경우에만 가입이 진행되며 비밀번호 길이를 검증한 후 비밀번호를 해싱하여 데이터베이스에 저장한다.
+* **설명**: 사용자가 회원가입 요청을 보내면 `AuthenticationService`가 `Database`를 조회하여 ID 중복 여부를 확인합니다.
+* **핵심 로직**: ID가 존재하지 않을 경우에만 가입이 진행되며, `CombinedFragment1`을 통해 비밀번호 길이 제한(8자 미만 오류) 검증 후, 비밀번호를 해싱(HashPassword)하여 데이터베이스에 저장합니다.
 
 ---
 
 ## 2. User Login Process
 
 <p align="center">
-  <img src="시퀀스2.png" width="100%">
+  <img src="./images/s2.png" width="100%">
 </p>
 
-### Description
+* **설명**: 사용자가 인증을 요청하면 `AuthenticationService`는 사용자 정보를 조회하여 유효성을 검증합니다.
+* **핵심 로직**: `Login Checkout` 프래그먼트를 통해 사용자 존재 여부 및 비밀번호 일치를 확인하며, 검증 성공 시 `User Object`를 반환하여 로그인 상태를 유지합니다.
 
-사용자가 인증을 요청하면 AuthenticationService는 사용자 정보를 조회하여 유효성을 검증한다.
-
-### Core Logic
-
-사용자 존재 여부 및 비밀번호 일치 여부를 확인하며 검증 성공 시 User 객체를 반환한다.
 
 ---
 
 ## 3. File Upload Process
 
 <p align="center">
-  <img src="시퀀스3.png" width="100%">
+  <img src="./images/s3.png" width="100%">
 </p>
 
-### Description
-
-FileUpload 객체가 SecurityScanService에 파일 평가를 요청하면 확장자 검사를 수행한다.
-
-### Core Logic
-
-검사 결과가 정상인 경우 기록을 저장하고 차단 대상인 경우 업로드를 중단한다.
+* **설명**: `:FileUpload` 객체가 `:SecurityScanService`에 파일 평가를 요청하면 확장자 검사(checkExtension)를 수행합니다.
+* **핵심 로직**: 검사 결과(`Process`)에 따라 상태가 `.OK`일 경우 기록을 저장하고, `Block`일 경우 에러를 반환하여 보안 정책을 준수합니다.
 
 ---
 
 ## 4. Security Scan Process
 
 <p align="center">
-  <img src="시퀀스4.png" width="100%">
+  <img src="./images/s4.png" width="100%">
 </p>
 
-### Description
-
-파일 업로드 시 수행되는 상세 보안 검사 흐름이다.
-
-### Core Logic
-
-SecurityPolicy를 참조하여 차단된 확장자를 검사하고 이중 확장자 공격 여부를 탐지한 뒤 결과를 생성한다.
+* **설명**: 파일 업로드 시 수행되는 상세 보안 검사 흐름입니다.
+* **핵심 로직**: `SecurityPolicy`를 참조하여 차단된 확장자인지 먼저 판단하며(break block), 추가적으로 이중 확장자 검사 및 보안 경고 생성을 수행하여 파일의 안전성을 검증합니다.
 
 ---
 
 ## 5. Record Deletion Process
 
 <p align="center">
-  <img src="시퀀스5.png" width="100%">
+  <img src="./images/s5.png" width="100%">
 </p>
 
-### Description
-
-사용자가 기록 삭제를 요청하면 시스템이 데이터베이스를 제어하여 삭제를 수행한다.
-
-### Core Logic
-
-기록 존재 여부를 확인하고 존재하면 삭제를 수행하며 존재하지 않으면 오류 메시지를 반환한다.
-
+* **설명**: 사용자가 `:WebUI`를 통해 기록 삭제를 요청하면 `:HistoryService`가 데이터베이스를 제어합니다.
+* **핵심 로직**: `alt` 프래그먼트를 통해 기록 존재 여부를 확인합니다. 기록이 존재하면 삭제를 수행하고 성공 메시지를, 존재하지 않으면 에러 메시지를 UI에 전달합니다.
 ---
 
 ## 6. History Search Process
 
 <p align="center">
-  <img src="시퀀스6.png" width="100%">
+  <img src="./images/s6.jpeg" width="100%">
 </p>
 
-### Description
+* **설명**: 사용자가 :WebUI를 통해 기록 삭제를 요청하면 :HistoryService가 데이터베이스를 제어합니다.
+핵심 로직: alt 프래그먼트를 통해 기록 존재 여부를 확인합니다. 기록이 존재하면 삭제를 수행하고 성공 메시지를, 존재하지 않으면 에러 메시지를 UI에 전달합니다.
+* **핵심 로직**: 기록 존재 여부를 확인합니다. 기록이 존재하면 삭제를 수행하고 성공 메시지를, 존재하지 않으면 에러 메시지를 UI에 전달합니다.
 
-사용자가 업로드 이력을 조회하거나 특정 파일명을 검색하는 과정이다.
 
-### Core Logic
 
-검색어가 없는 경우 전체 기록을 최신순으로 조회하고 검색어가 있는 경우 파일명 기준으로 검색 결과를 반환한다.
-
----
+------
 
 # 4. State Machine Diagram
 
 <p align="center">
-  <img src="스테이트.png" width="100%">
+  <img src="./images/state.png" width="100%">
 </p>
 
 ### Description
