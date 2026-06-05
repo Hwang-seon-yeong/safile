@@ -44,7 +44,7 @@ Safile은 Flask 기반 웹 애플리케이션으로 구현되며, 로그인 시�
 # 2. Class Diagram
 
 <p align="center">
-  <img src="/images/class.png" width="100%">
+  <img src="https://github.com/Hwang-seon-yeong/safile/blob/main/images/class.png?raw=true" width="100%">
 </p>
 
 ## 1) AuthenticationService
@@ -272,7 +272,7 @@ FileDeletion은 업로드 기록 삭제 기능을 담당하는 클래스이다. 
 ## 1. User Signup Process
 
 <p align="center">
-  <img src="./images/s1.png" width="100%">
+  <img src="https://github.com/Hwang-seon-yeong/safile/blob/main/images/s1.png?raw=true" width="100%">
 </p>
 
 * **설명**: 사용자가 회원가입 요청을 보내면 `AuthenticationService`가 `Database`를 조회하여 ID 중복 여부를 확인합니다.
@@ -283,7 +283,7 @@ FileDeletion은 업로드 기록 삭제 기능을 담당하는 클래스이다. 
 ## 2. User Login Process
 
 <p align="center">
-  <img src="/images/s2.png" width="100%">
+  <img src="https://github.com/Hwang-seon-yeong/safile/blob/main/images/s2.png?raw=true" width="100%">
 </p>
 
 * **설명**: 사용자가 인증을 요청하면 `AuthenticationService`는 사용자 정보를 조회하여 유효성을 검증합니다.
@@ -295,7 +295,7 @@ FileDeletion은 업로드 기록 삭제 기능을 담당하는 클래스이다. 
 ## 3. File Upload Process
 
 <p align="center">
-  <img src="./images/s3.png" width="100%">
+  <img src="https://github.com/Hwang-seon-yeong/safile/blob/main/images/s3.png?raw=true" width="100%">
 </p>
 
 * **설명**: `:FileUpload` 객체가 `:SecurityScanService`에 파일 평가를 요청하면 확장자 검사(checkExtension)를 수행합니다.
@@ -306,7 +306,7 @@ FileDeletion은 업로드 기록 삭제 기능을 담당하는 클래스이다. 
 ## 4. Security Scan Process
 
 <p align="center">
-  <img src="./images/s4.png" width="100%">
+  <img src="https://github.com/Hwang-seon-yeong/safile/blob/main/images/s4.png?raw=true" width="100%">
 </p>
 
 * **설명**: 파일 업로드 시 수행되는 상세 보안 검사 흐름입니다.
@@ -317,7 +317,7 @@ FileDeletion은 업로드 기록 삭제 기능을 담당하는 클래스이다. 
 ## 5. Record Deletion Process
 
 <p align="center">
-  <img src="./images/s5.png" width="100%">
+  <img src="https://github.com/Hwang-seon-yeong/safile/blob/main/images/s5.png?raw=true" width="100%">
 </p>
 
 * **설명**: 사용자가 `:WebUI`를 통해 기록 삭제를 요청하면 `:HistoryService`가 데이터베이스를 제어합니다.
@@ -327,7 +327,7 @@ FileDeletion은 업로드 기록 삭제 기능을 담당하는 클래스이다. 
 ## 6. History Search Process
 
 <p align="center">
-  <img src="./images/s6.jpeg" width="100%">
+  <img src="https://github.com/Hwang-seon-yeong/safile/blob/main/images/s6.jpeg?raw=true" width="100%">
 </p>
 
 * **설명**: 사용자가 :WebUI를 통해 기록 삭제를 요청하면 :HistoryService가 데이터베이스를 제어합니다.
@@ -341,7 +341,7 @@ FileDeletion은 업로드 기록 삭제 기능을 담당하는 클래스이다. 
 # 4. State Machine Diagram
 
 <p align="center">
-  <img src="./images/state.png" width="100%">
+  <img src="https://github.com/Hwang-seon-yeong/safile/blob/main/images/state.png?raw=true" width="100%">
 </p>
 
 ### Description
