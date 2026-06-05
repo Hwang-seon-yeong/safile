@@ -1,10 +1,36 @@
+/* ==========================================================================
+   0. 글로벌 변수 선언 및 브라우저 기본 세팅 교정
+   ========================================================================== */
+   :root {
+    --primary-color: #2563eb;
+    --border-color: #1e293b;
+    --text-light: #94a3b8;
+}
+
+/* 🎯 [완벽 해결] 로고 주변 박스 제거 및 텍스트 음영 박스 강제 제거 */
+.history-top-flex h1, 
+.history-top-flex p, 
+.navbar-brand-title, 
+.sidebar-brand-node, 
+.top-navbar-header .navbar-brand-title, 
+.sidebar-drawer-header .sidebar-brand-node,
+.stat-value, 
+.stat-label {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
 /* --- 대시보드 레이아웃 스타일 디자인 --- */
 .dashboard-body {
     background-color: #030213;
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     margin: 0;
     padding: 2rem;
-    display: block; /* 가로 중앙 배치 해제 */
+    display: block;
     min-height: 100vh;
     box-sizing: border-box;
 }
@@ -30,7 +56,7 @@
 /* 통계 카드 디자인 */
 .stats-grid {
     display: grid;
-    grid-template-cols: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1rem;
 }
 
@@ -107,12 +133,12 @@
 /* 하단 2분할 구조 */
 .bottom-split-grid {
     display: grid;
-    grid-template-cols: 2fr 1fr;
+    grid-template-columns: 2fr 1fr;
     gap: 1.5rem;
 }
 
 @media (max-width: 768px) {
-    .bottom-split-grid { grid-template-cols: 1fr; }
+    .bottom-split-grid { grid-template-columns: 1fr; }
 }
 
 .recent-uploads-box, .quick-actions-card, .system-status-card {
@@ -190,7 +216,7 @@
 
 .profile-stats-bottom {
     display: grid;
-    grid-template-cols: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     text-align: center;
     padding-top: 1rem;
     border-top: 1px solid rgba(59, 130, 246, 0.2);
@@ -327,7 +353,7 @@
     justify-content: center;
     font-size: 1.25rem;
 }
-.preview-file-details { flex: 1; min-w: 0; text-align: left; }
+.preview-file-details { flex: 1; min-width: 0; text-align: left; }
 .preview-filename-text { color: #ffffff; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .preview-filesize-text { color: #64748b; font-size: 0.875rem; }
 .remove-file-action { background: none; border: none; color: #64748b; font-size: 1.25rem; cursor: pointer; transition: color 0.2s; }
@@ -357,14 +383,14 @@
 .primary-scan-button:hover { background-color: #1d4ed8; }
 
 /* 안내 그리드들 */
-.info-split-grid { display: grid; grid-template-cols: 1fr 1fr; gap: 1fr; gap: 1rem; }
-@media (max-width: 600px) { .info-split-grid { grid-template-cols: 1fr; } }
+.info-split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 600px) { .info-split-grid { grid-template-columns: 1fr; } }
 .info-card-item { display: flex; align-items: start; gap: 1rem; background-color: #0d1527; border: 1px solid #1e293b; border-radius: 0.625rem; padding: 1.25rem; text-align: left; }
 .info-icon-wrapper { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
 .info-card-text h3, .req-card h3 { color: #ffffff; font-size: 1rem; margin: 0 0 0.25rem 0; }
 .info-card-text p { color: #94a3b8; font-size: 0.875rem; margin: 0; }
 
-.requirements-three-grid { display: grid; grid-template-cols: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.requirements-three-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
 .req-card { background-color: #0d1527; border: 1px solid #1e293b; border-radius: 0.625rem; padding: 1.25rem; text-align: left; }
 .req-title-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
 .icon-mini-box { width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
@@ -382,7 +408,7 @@
 /* 하단 체크리스트 수행 목록 영역 */
 .checks-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; text-align: left; }
 .checks-header h2 { color: #ffffff; font-size: 1.25rem; margin: 0; }
-.checks-grid-list { display: grid; grid-template-cols: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.85rem; text-align: left; }
+.checks-grid-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.85rem; text-align: left; }
 .check-item-line { display: flex; align-items: center; gap: 0.5rem; color: #cbd5e1; font-size: 0.875rem; }
 
 /* --- 8. 보안 침해 모달창 오버레이 디자인 (팝업) --- */
@@ -426,12 +452,9 @@
 /* 숨김 상태 클래스 */
 .hidden { display: none !important; }
 
-
-/*여기서부터 로그인
 /* ==========================================
-   3. 로그인 컴포넌트 전용 스타일 (새로 추가되는 부분)
+   3. 로그인 컴포넌트 전용 스타일 
    ========================================== */
-/* 로그인 화면 전체 페이지 배경 (리액트의 그라데이션 완벽 구현) */
 body.login-full-page {
     background: linear-gradient(135deg, #020617 0%, #071437 50%, #0f172a 100%);
     color: #ffffff;
@@ -481,7 +504,6 @@ body.login-full-page {
     font-size: 1rem;
 }
 
-/* 반투명 유리창 효과 카드 (Backdrop Blur) */
 .login-card-main {
     background-color: rgba(15, 23, 42, 0.5);
     backdrop-filter: blur(8px);
@@ -498,7 +520,6 @@ body.login-full-page {
     gap: 1.5rem;
 }
 
-/* 입력창 필드 디자인 */
 .input-field-group {
     display: flex;
     flex-direction: column;
@@ -542,7 +563,6 @@ body.login-full-page {
     color: #475569;
 }
 
-/* 경고창 배너 */
 .login-error-banner {
     display: flex;
     align-items: center;
@@ -556,7 +576,6 @@ body.login-full-page {
     text-align: left;
 }
 
-/* 로그인 버튼 */
 .login-submit-button {
     background-color: #2563eb;
     color: #ffffff;
@@ -572,7 +591,6 @@ body.login-full-page {
     background-color: #1d4ed8;
 }
 
-/* 하단 전환용 텍스트 링크 */
 .login-footer-switch {
     text-align: center;
     color: #94a3b8;
@@ -589,7 +607,6 @@ body.login-full-page {
     text-decoration: underline;
 }
 
-/* 엔터프라이즈 하단 문구 */
 .login-security-notice {
     margin-top: 1.5rem;
     text-align: center;
@@ -597,11 +614,9 @@ body.login-full-page {
     font-size: 0.85rem;
 }
 
-/* 여기서부터 폴리시인포 
 /* ==========================================
-   7. 정책 관리(Policy) 전용 스타일 (정렬 및 격자 깨짐 수정)
+   7. 정책 관리(Policy) 전용 스타일 
    ========================================== */
-/* 상단 헤더 배치 */
 .policy-top-flex {
     display: flex;
     justify-content: space-between;
@@ -616,7 +631,6 @@ body.login-full-page {
     margin: 0 0 0.25rem 0;
 }
 
-/* 정책 통계 대시보드 그리드 (독립 클래스로 분리) */
 .policy-dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -636,7 +650,6 @@ body.login-full-page {
     justify-content: center;
 }
 
-/* 정책 규칙 리스트 및 테이블 컨테이너 */
 .policy-wrapper-box {
     background-color: #0f172a;
     border: 1px solid var(--border-color);
@@ -646,7 +659,6 @@ body.login-full-page {
     text-align: left;
 }
 
-/* 스위치 토글 버튼 정렬 깨짐 방지 */
 .policy-toggle-row {
     display: flex;
     align-items: center;
@@ -674,7 +686,6 @@ body.login-full-page {
     font-size: 0.875rem;
 }
 
-/* 규칙 관리 테이블 깨짐 방지 */
 .policy-table-scroll {
     width: 100%;
     overflow-x: auto;
@@ -709,7 +720,6 @@ body.login-full-page {
     background-color: rgba(30, 41, 59, 0.2);
 }
 
-/* 정책 하단 저장/수정 버튼 라인 */
 .policy-action-flex {
     display: flex;
     justify-content: flex-end;
@@ -718,21 +728,19 @@ body.login-full-page {
     width: 100%;
 }
 
-/*여기부터는 회원가입
 /* ==========================================
-   5. 회원가입 컴포넌트 전용 스타일 (새로 추가되는 부분)
+   5. 회원가입 컴포넌트 전용 스타일 
    ========================================== */
-   .signup-space-y {
+.signup-space-y {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem; /* 입력 필드가 많아 간격을 살짝 좁게 세팅 */
+    gap: 1.25rem;
 }
 
-/*여기부터는 히스토리
 /* ==========================================
-   6. 업로드 히스토리 전용 스타일 (정렬 깨짐 수정본)
+   6. 업로드 히스토리 전용 스타일 
    ========================================== */
-   .history-top-flex {
+.history-top-flex {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -763,7 +771,6 @@ body.login-full-page {
 }
 .btn-primary-flex:hover { background-color: #1d4ed8; }
 
-/* 퀵 탭 스타일 */
 .quick-filter-tabs {
     display: flex;
     gap: 0.75rem;
@@ -781,12 +788,26 @@ body.login-full-page {
     transition: all 0.2s;
 }
 .tab-btn:hover { color: #ffffff; border-color: #475569; }
-.tab-btn.active { background-color: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
-.tab-btn[data-status="SAFE"].active { background-color: #16a34a; border-color: #16a34a; }
-.tab-btn[data-status="WARNING"].active { background-color: #ca8a04; border-color: #ca8a04; }
-.tab-btn[data-status="BLOCKED"].active { background-color: #dc2626; border-color: #dc2626; }
-
-/* 통계 그리드 깨짐 방지 */
+.tab-btn.active { 
+    background-color: var(--primary-color) !important; 
+    color: #ffffff !important; 
+    border-color: var(--primary-color) !important; 
+}
+.tab-btn[data-status="SAFE"].active { 
+    background-color: #16a34a !important; 
+    border-color: #16a34a !important; 
+    color: #ffffff !important; 
+}
+.tab-btn[data-status="WARNING"].active { 
+    background-color: #ca8a04 !important; 
+    border-color: #ca8a04 !important; 
+    color: #ffffff !important; 
+}
+.tab-btn[data-status="BLOCKED"].active { 
+    background-color: #dc2626 !important; 
+    border-color: #dc2626 !important; 
+    color: #ffffff !important; 
+}
 .policy-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -810,7 +831,6 @@ body.login-full-page {
     margin-top: 0.25rem;
 }
 
-/* 필터 인풋 박스 */
 .search-filter-bg-box {
     background-color: #0f172a;
     border: 1px solid var(--border-color);
@@ -849,7 +869,6 @@ body.login-full-page {
 }
 .search-input-wrapper input:focus { border-color: var(--primary-color); }
 
-/* 셀렉트 드롭다운 스타일 */
 .select-wrapper-relative {
     position: relative;
     min-width: 180px;
@@ -885,7 +904,6 @@ body.login-full-page {
     font-size: 0.9rem;
 }
 
-/* 필터링 인디케이터 태그 라인 */
 .active-tags-line {
     display: flex;
     align-items: center;
@@ -908,12 +926,11 @@ body.login-full-page {
 }
 .clear-all-text-btn:hover { color: #ffffff; text-decoration: underline; }
 
-/* 메인 테이블 스크롤 및 레이아웃 깨짐 교정 */
 .history-table-container {
     background-color: #0f172a;
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
-    overflow-x: auto; /* 화면 좁아질 때 가로 스크롤 보장 */
+    overflow-x: auto;
     margin-bottom: 1.5rem;
     width: 100%;
 }
@@ -921,7 +938,7 @@ body.login-full-page {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-    min-width: 800px; /* 테이블 컬럼들이 찌그러지지 않도록 최소 폭 제한 */
+    min-width: 800px;
 }
 .history-main-table th {
     background-color: rgba(15, 23, 42, 0.6);
@@ -941,11 +958,10 @@ body.login-full-page {
 }
 .history-main-table tr:hover td { background-color: rgba(30, 41, 59, 0.2); }
 
-/* 파일명 생략 처리 */
 .table-filename-text { 
     color: #ffffff; 
     font-weight: 500; 
-    max-w-xs: 240px;
+    max-width: 240px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -959,13 +975,11 @@ body.login-full-page {
     font-weight: 600;
 }
 
-/* 테이블 배지 상태 색상 정의 */
 .status-badge-base { font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid transparent; font-weight: 600; }
 .status-badge-safe { color: #4ade80; background-color: rgba(22, 163, 74, 0.1); border-color: rgba(22, 163, 74, 0.2); }
 .status-badge-warning { color: #facc15; background-color: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.2); }
 .status-badge-blocked { color: #f87171; background-color: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.2); }
 
-/* 액션 링크 및 휴지통 버튼 */
 .table-action-flex { display: flex; align-items: center; gap: 1rem; }
 .view-details-link { color: #60a5fa; text-decoration: none; font-size: 0.875rem; font-weight: 500; }
 .view-details-link:hover { text-decoration: underline; color: #93c5fd; }
@@ -973,7 +987,6 @@ body.login-full-page {
 .table-delete-trash-btn:hover { color: #f87171; }
 .table-empty-row { text-align: center; padding: 3rem !important; color: #94a3b8; }
 
-/* 네비게이션 풋터 */
 .pagination-footer-flex { 
     display: flex; 
     justify-content: space-between; 
