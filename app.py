@@ -4,6 +4,7 @@ import sqlite3
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import g
+from flask import redirect, url_for, flash, request
 
 app = Flask(__name__)
 app.secret_key = 'safile_secret_key_for_session' # 로그인 세션 관리를 위한 비밀키 설정
@@ -528,6 +529,16 @@ def load_logged_in_user():
         g.current_user = CurrentUser(user_id, session.get('username'))
     else:
         g.current_user = None
+
+@app.route('/delete/<int:upload_id>', methods=['POST'])
+def delete_upload(upload_id):
+    # 여기서 데이터베이스나 파일 시스템에서 파일을 삭제하는 로직을 수행하세요.
+    # 예: upload = Upload.query.get_or_404(upload_id)
+    # db.session.delete(upload)
+    # db.session.commit()
+    
+    flash('파일이 삭제되었습니다.', 'success')
+    return redirect(url_for('history')) # 삭제 후 히스토리 페이지로 다시 이동
 
 # 3. 서버 실행 (마지막에 위치)
 if __name__ == '__main__':

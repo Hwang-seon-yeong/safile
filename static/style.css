@@ -509,3 +509,72 @@ body {
     border-radius: 4px;
     letter-spacing: 0.05em;
 }
+/* rule-row-item 내부를 가로 정렬로 강제 전환 */
+.rule-row-item {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 0 !important;
+}
+
+/* 아이콘과 텍스트 영역 */
+.rule-left {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 12px !important;
+    flex-grow: 1 !important;
+    white-space: nowrap !important;
+}
+
+/* 아이콘 크기 고정 */
+.rule-left i {
+    min-width: 20px !important;
+    text-align: center !important;
+}
+
+/* 텍스트 줄바꿈 방지 및 말줄임 처리 (글자가 길어질 경우) */
+.rule-left span {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* 범위를 아주 좁게 지정하여 기존 스타일 무력화 */
+.policy-rules-list .rule-row-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    padding: 15px 0 !important;
+    border: none !important;
+}
+
+.policy-rules-list .rule-left {
+    display: flex !important;
+    align-items: center !important;
+    flex-direction: row !important;
+    gap: 15px !important;
+    white-space: nowrap !important;
+    width: auto !important;
+}
+
+/* 태그 박스 중앙 정렬 및 가독성 개선 */
+.tag-badge-block, .tag-badge-allow, .tag-badge-warning {
+    display: flex !important;           /* 플렉스 박스로 전환 */
+    align-items: center !important;     /* 세로 중앙 정렬 */
+    justify-content: center !important; /* 가로 중앙 정렬 (이게 핵심!) */
+    
+    /* 박스 크기 및 폰트 설정 */
+    padding: 2px 10px !important;       /* 상하 여백을 줄여 박스 높이 조정 */
+    height: 24px !important;            /* 박스 높이를 고정하여 중앙 위치 확보 */
+    font-size: 0.75rem !important;      /* 글자 크기 살짝 축소 */
+    font-weight: 700 !important;
+    border-radius: 4px !important;
+    
+    /* 혹시 모를 텍스트 정렬 강제 지정 */
+    text-align: center !important;
+    white-space: nowrap !important;
+    min-width: 60px !important;         /* 최소 너비를 지정하여 박스 유지 */
+}

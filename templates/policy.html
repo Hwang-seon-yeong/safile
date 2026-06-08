@@ -14,28 +14,28 @@
     <div class="policy-stat-card">
         <div class="stat-top-row">
             <span class="stat-label">Total Scans Today</span>
-            <span class="stat-change text-green">+12%</span>
+            <span class="stat-change text-green"></span>
         </div>
         <div class="stat-value">1,284</div>
     </div>
     <div class="stat-card policy-stat-card">
         <div class="stat-top-row">
             <span class="stat-label">Threats Blocked</span>
-            <span class="stat-change text-red">-3%</span>
+            <span class="stat-change text-red"></span>
         </div>
         <div class="stat-value">{{ blocked_count }}</div>
     </div>
     <div class="stat-card policy-stat-card">
         <div class="stat-top-row">
             <span class="stat-label">Policy Violations</span>
-            <span class="stat-change text-green">+8%</span>
+            <span class="stat-change text-green"></span>
         </div>
         <div class="stat-value">{{ warning_count + blocked_count }}</div>
     </div>
     <div class="stat-card policy-stat-card">
         <div class="stat-top-row">
             <span class="stat-label">System Uptime</span>
-            <span class="stat-change text-muted">0%</span>
+            <span class="stat-change text-muted"></span>
         </div>
         <div class="stat-value">99.9%</div>
     </div>
@@ -92,11 +92,30 @@
             </div>
         </div>
         <div class="policy-rules-list">
-            <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Executable files (.exe, .bat, .cmd, .msi)</span></div><span class="tag-badge-block">BLOCK</span></div>
-            <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Script files (.ps1, .vbs, .js)</span></div><span class="tag-badge-block">BLOCK</span></div>
-            <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-check text-green"></i><span>Document/Image files (.pdf, .docx, .jpg, .png)</span></div><span class="tag-badge-allow">ALLOW</span></div>
+            <div class="rule-row-item" style="display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 10px 0 !important;">
+                <div class="rule-left" style="display: flex !important; align-items: center !important; gap: 10px !important;">
+                    <i class="fa-regular fa-circle-xmark text-red"></i>
+                    <span style="white-space: nowrap !important;">Executable files (.exe, .bat, .cmd, .msi)</span>
+                </div>
+                <span class="tag-badge-block" style="flex-shrink: 0 !important;">BLOCK</span>
+            </div>
+        
+            <div class="rule-row-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;">
+                <div class="rule-left" style="display: flex; align-items: center; gap: 10px; height: 30px;">
+                    <i class="fa-regular fa-circle-xmark text-red" style="display: flex; align-items: center; justify-content: center; width: 20px;"></i>
+                    <span style="display: flex; align-items: center; white-space: nowrap;">Executable files (.exe, .bat, .cmd, .msi)</span>
+                </div>
+                <span class="tag-badge-block">BLOCK</span>
+            </div>
+        
+            <div class="rule-row-item" style="display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 10px 0 !important;">
+                <div class="rule-left" style="display: flex !important; align-items: center !important; gap: 10px !important;">
+                    <i class="fa-regular fa-circle-check text-green"></i>
+                    <span style="white-space: nowrap !important;">Document/Image files (.pdf, .docx, .jpg, .png)</span>
+                </div>
+                <span class="tag-badge-allow" style="flex-shrink: 0 !important;">ALLOW</span>
+            </div>
         </div>
-    </div>
 
     <div class="policy-wrapper-box">
         <div class="policy-card-top">
