@@ -476,18 +476,50 @@ def result():
 def policy():
     if 'username' not in session:
         return redirect(url_for('login'))
+    # 위에서 만든 context_processor가 자동으로 변수를 주입해주므로 그냥 렌더링만 하면 됩니다!
     return render_template('policy.html')
 
+@app.context_processor
+def inject_user_stats():
+    # 로그인 중일 때만 데이터 조회
+    if 'user_id' in session:
+        user_id = session.get('user_id')
+        conn = sqlite3.connect('safile.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM history WHERE status = 'BLOCKED' AND user_id = ?", (user_id,))
+        count = cursor.fetchone()[0]
+        conn.close()
+        return dict(blocked_count=count)
+    return dict(blocked_count=0)
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5001)
 
+# --- 수정된 하단부 코드 ---
 
+# 1. 모든 페이지에서 사용할 변수 주입 (중복 합침)
+@app.context_processor
+def inject_all_stats():
+    if 'user_id' in session:
+        user_id = session.get('user_id')
+        conn = sqlite3.connect('safile.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT status, COUNT(*) FROM history WHERE user_id = ? GROUP BY status", (user_id,))
+        rows = cursor.fetchall()
+        
+        stats = {status: count for status, count in rows}
+        conn.close()
+        
+        return dict(
+            blocked_count=stats.get('BLOCKED', 0),
+            warning_count=stats.get('WARNING', 0),
+            safe_count=stats.get('SAFE', 0)
+        )
+    return dict(blocked_count=0, warning_count=0, safe_count=0)
+
+# 2. 요청 전처리 (들여쓰기 확인 필수!)
 @app.before_request
 def load_logged_in_user():
     user_id = session.get('user_id')
     if user_id:
-        # 간단한 사용자 객체 생성 (실제 DB 조회도 가능)
         class CurrentUser:
             def __init__(self, id, username):
                 self.id = id
@@ -496,3 +528,7 @@ def load_logged_in_user():
         g.current_user = CurrentUser(user_id, session.get('username'))
     else:
         g.current_user = None
+
+# 3. 서버 실행 (마지막에 위치)
+if __name__ == '__main__':
+    app.run(debug=True, port=5001)

@@ -52,11 +52,10 @@
         </ul>
 
         <div class="sidebar-user-footer">
-            <div class="sidebar-user-avatar">{{ (session.get('username') or 'D')[0].upper() }}</div>
-            
+            <div class="sidebar-user-avatar">{{ (g.current_user.username or 'D')[0].upper() if g.current_user else 'D' }}</div>
             <div class="sidebar-user-info">
-                <div class="sidebar-user-name">{{ session.get('username') or 'Demo User' }}</div>
-                <div class="sidebar-user-email">{{ session.get('username', '').lower() + '@safile.local' }}</div>
+                <div class="sidebar-user-name">{{ g.current_user.username or 'Demo User' }}</div>
+                <div class="sidebar-user-email">{{ (g.current_user.username.lower() + '@safile.local') if g.current_user else 'demo@safile.io' }}</div>
             </div>
             <a href="{{ url_for('logout') }}" class="sidebar-logout-btn" title="Logout">
                 <i class="fa-solid fa-right-from-bracket"></i>

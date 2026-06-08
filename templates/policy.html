@@ -1,84 +1,131 @@
 {% extends 'base.html' %}
+
 {% block title %}Security Policy{% endblock %}
 
 {% block content %}
 <div class="policy-top-flex">
     <div>
         <h1>Security Policy</h1>
-        <p style="color:#64748b;margin:0.25rem 0 0;">Configure your file security rules</p>
+        <p class="text-slate-400">Review and understand the security policies protecting your uploads</p>
     </div>
 </div>
 
 <div class="policy-dashboard-grid">
     <div class="policy-stat-card">
-        <div style="color:#94a3b8;font-size:.875rem;margin-bottom:.25rem;">Active Policies</div>
-        <div class="stat-value text-blue">8</div>
+        <div class="stat-top-row">
+            <span class="stat-label">Total Scans Today</span>
+            <span class="stat-change text-green">+12%</span>
+        </div>
+        <div class="stat-value">1,284</div>
     </div>
-    <div class="policy-stat-card">
-        <div style="color:#94a3b8;font-size:.875rem;margin-bottom:.25rem;">Blocked This Month</div>
-        <div class="stat-value text-red">{{ blocked_count }}</div>
+    <div class="stat-card policy-stat-card">
+        <div class="stat-top-row">
+            <span class="stat-label">Threats Blocked</span>
+            <span class="stat-change text-red">-3%</span>
+        </div>
+        <div class="stat-value">{{ blocked_count }}</div>
     </div>
-    <div class="policy-stat-card">
-        <div style="color:#94a3b8;font-size:.875rem;margin-bottom:.25rem;">Warnings Issued</div>
-        <div class="stat-value text-yellow">{{ warning_count }}</div>
+    <div class="stat-card policy-stat-card">
+        <div class="stat-top-row">
+            <span class="stat-label">Policy Violations</span>
+            <span class="stat-change text-green">+8%</span>
+        </div>
+        <div class="stat-value">{{ warning_count + blocked_count }}</div>
     </div>
-    <div class="policy-stat-card">
-        <div style="color:#94a3b8;font-size:.875rem;margin-bottom:.25rem;">Policy Violations</div>
-        <div class="stat-value text-red">{{ blocked_count + warning_count }}</div>
+    <div class="stat-card policy-stat-card">
+        <div class="stat-top-row">
+            <span class="stat-label">System Uptime</span>
+            <span class="stat-change text-muted">0%</span>
+        </div>
+        <div class="stat-value">99.9%</div>
     </div>
 </div>
 
 <div class="policy-wrapper-box">
-    <h2 style="color:#fff;margin:0 0 1rem;font-size:1.1rem;">
-        <i class="fa-solid fa-toggle-on text-blue" style="margin-right:.5rem;"></i>Active Security Rules
-    </h2>
-    {% set policies = [
-        ('Executable File Blocking', 'Block all .exe, .bat, .cmd, .dll, .scr files', True, 'HIGH'),
-        ('Script File Restriction', 'Block .vbs, .ps1, .js, .hta script files', True, 'HIGH'),
-        ('Archive File Warning', 'Warn on .zip, .rar, .7z, .tar.gz archives', True, 'MEDIUM'),
-        ('Maximum File Size (50MB)', 'Block files exceeding 50MB', True, 'LOW'),
-        ('MIME Type Validation', 'Verify file content matches extension', True, 'MEDIUM'),
-        ('Malware Signature Check', 'Scan against known malware signatures', True, 'HIGH'),
-        ('Document Macro Detection', 'Warn on Office files with macros', False, 'HIGH'),
-        ('Duplicate File Detection', 'Flag duplicate file submissions', False, 'LOW'),
-    ] %}
-    {% for name, desc, active, severity in policies %}
-    <div class="policy-toggle-row">
-        <div class="policy-info-zone">
-            <div class="policy-title-text">{{ name }}</div>
-            <div class="policy-desc-text">{{ desc }}</div>
+    <div class="card-section-title">
+        <i class="fa-solid fa-shield-halved text-blue"></i>
+        <h2 class="inline-title-h2">Security Features</h2>
+    </div>
+    <div class="features-split-grid">
+        <div class="feature-item-box">
+            <div class="feature-icon-circle blue-bg"><i class="fa-solid fa-expand text-blue"></i></div>
+            <div>
+                <div class="feature-item-title">Real-time Scanning</div>
+                <div class="feature-item-desc">All uploads are scanned immediately upon receipt</div>
+            </div>
         </div>
-        <div style="display:flex;align-items:center;gap:1rem;">
-            <span class="status-badge-base {% if severity == 'HIGH' %}status-badge-blocked{% elif severity == 'MEDIUM' %}status-badge-warning{% else %}status-badge-safe{% endif %}"
-                  style="font-size:.7rem;">{{ severity }}</span>
-            <div class="toggle-switch {% if active %}toggle-on{% endif %}" title="{% if active %}Active{% else %}Inactive{% endif %}">
-                <div class="toggle-knob"></div>
+        <div class="feature-item-box">
+            <div class="feature-icon-circle blue-bg"><i class="fa-solid fa-lock text-blue"></i></div>
+            <div>
+                <div class="feature-item-title">Encrypted Storage</div>
+                <div class="feature-item-desc">Files are encrypted at rest using AES-256</div>
+            </div>
+        </div>
+        <div class="feature-item-box">
+            <div class="feature-icon-circle blue-bg"><i class="fa-solid fa-database text-blue"></i></div>
+            <div>
+                <div class="feature-item-title">Threat Database</div>
+                <div class="feature-item-desc">Updated daily with latest malware signatures</div>
+            </div>
+        </div>
+        <div class="feature-item-box">
+            <div class="feature-icon-circle blue-bg"><i class="fa-solid fa-shield-halved text-blue"></i></div>
+            <div>
+                <div class="feature-item-title">Automatic Quarantine</div>
+                <div class="feature-item-desc">Suspicious files are isolated automatically</div>
             </div>
         </div>
     </div>
-    {% endfor %}
 </div>
 
-<div class="policy-wrapper-box">
-    <h2 style="color:#fff;margin:0 0 1rem;font-size:1.1rem;">
-        <i class="fa-solid fa-ban text-red" style="margin-right:.5rem;"></i>Blocked Extensions
-    </h2>
-    <div class="blocked-tags-flex">
-        {% for ext in ['.exe','.bat','.cmd','.com','.msi','.dll','.vbs','.js','.jse','.wsf','.ps1','.ps2','.scr','.hta','.cpl','.msc','.reg','.inf','.lnk','.pif'] %}
-        <span class="blocked-tag">{{ ext }}</span>
-        {% endfor %}
+<div class="active-policies-zone">
+    <h2 class="zone-main-title">Active Security Policies</h2>
+
+    <div class="policy-wrapper-box">
+        <div class="policy-card-top">
+            <div class="policy-title-flex">
+                <div class="policy-avatar blue-bg"><i class="fa-regular fa-file-excel text-blue"></i></div>
+                <div>
+                    <h3>File Type Restrictions <span class="badge-active">Active</span></h3>
+                    <p class="policy-card-desc">Blocks executable and potentially dangerous file types</p>
+                </div>
+            </div>
+        </div>
+        <div class="policy-rules-list">
+            <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Executable files (.exe, .bat, .cmd, .msi)</span></div><span class="tag-badge-block">BLOCK</span></div>
+            <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Script files (.ps1, .vbs, .js)</span></div><span class="tag-badge-block">BLOCK</span></div>
+            <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-check text-green"></i><span>Document/Image files (.pdf, .docx, .jpg, .png)</span></div><span class="tag-badge-allow">ALLOW</span></div>
+        </div>
+    </div>
+
+    <div class="policy-wrapper-box">
+        <div class="policy-card-top">
+            <div class="policy-title-flex">
+                <div class="policy-avatar red-bg"><i class="fa-solid fa-triangle-exclamation text-red"></i></div>
+                <div>
+                    <h3>Malware Detection <span class="badge-active">Active</span></h3>
+                    <p class="policy-card-desc">Scans files for known malware signatures and suspicious patterns</p>
+                </div>
+            </div>
+        </div>
+        <div class="policy-rules-list">
+            <div class="rule-row-item"><div class="rule-left"><i class="fa-regular fa-circle-xmark text-red"></i><span>Files matching known malware signatures</span></div><span class="tag-badge-block">BLOCK</span></div>
+            <div class="rule-row-item"><div class="rule-left"><i class="fa-solid fa-triangle-exclamation text-yellow"></i><span>Files with embedded macros</span></div><span class="tag-badge-warning">WARNING</span></div>
+        </div>
     </div>
 </div>
 
-<div class="policy-wrapper-box">
-    <h2 style="color:#fff;margin:0 0 1rem;font-size:1.1rem;">
-        <i class="fa-solid fa-triangle-exclamation text-yellow" style="margin-right:.5rem;"></i>Warning Extensions
-    </h2>
-    <div class="blocked-tags-flex">
-        {% for ext in ['.zip','.rar','.7z','.tar','.gz','.iso','.img','.dmg','.apk','.ipa','.jar','.sh','.py','.rb'] %}
-        <span style="background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.2);color:#facc15;font-size:.75rem;padding:.25rem .65rem;border-radius:6px;font-weight:600;">{{ ext }}</span>
-        {% endfor %}
+<div class="policy-guide-banner">
+    <div class="guide-flex-box">
+        <div class="guide-icon-box"><i class="fa-solid fa-triangle-exclamation text-blue"></i></div>
+        <div class="guide-content-area">
+            <h3>Best Practices</h3>
+            <ul>
+                <li>Only upload files from trusted sources</li>
+                <li>Scan files with your local antivirus before uploading</li>
+                <li>Review warnings carefully before proceeding with flagged files</li>
+            </ul>
+        </div>
     </div>
 </div>
 {% endblock %}
-
