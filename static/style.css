@@ -453,4 +453,59 @@
        .stats-grid { grid-template-columns: repeat(2, 1fr); }
    }
    
-   
+   /* static/style.css 에 추가 */
+.policy-rules-list {
+    line-height: 1.8; /* 줄 간격 넓히기 */
+    letter-spacing: -0.02em; /* 간격 살짝 조절 */
+}
+
+.feature-item-desc, .policy-card-desc {
+    font-size: 0.9em;
+    color: #94a3b8; /* 글자색을 약간 흐리게 하여 강조할 부분과 차별화 */
+}
+/* 1. 전체적인 가독성 개선 */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 2. 정책 리스트의 간격 조정 */
+.policy-rules-list {
+    margin-top: 15px;
+}
+
+.rule-row-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    line-height: 1.6;
+}
+
+.rule-row-item:last-child {
+    border-bottom: none;
+}
+
+/* 3. 텍스트 레이블 및 아이콘 간격 */
+.rule-left {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* 아이콘과 글자 사이 간격 */
+}
+
+/* 4. 설명 문구 스타일 (작게, 연하게) */
+.policy-card-desc {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+/* 5. 배지(BLOCK/ALLOW) 스타일 */
+.tag-badge-block, .tag-badge-allow, .tag-badge-warning {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+}
