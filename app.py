@@ -3,6 +3,7 @@ import os
 import sqlite3
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import g
 
 app = Flask(__name__)
 app.secret_key = 'safile_secret_key_for_session' # 로그인 세션 관리를 위한 비밀키 설정
@@ -386,15 +387,56 @@ def history():
         return redirect(url_for('login'))
     
     user_id = session.get('user_id')
-    search_keyword = request.args.get('search', '').strip()
-    
-    if search_keyword:
-        records = HistorySearch.search_by_filename(user_id, search_keyword)
-    else:
-        records = HistorySearch.get_all_history(user_id)
-        
-    return render_template('history.html', records=records)
+    status_filter = request.args.get('status', 'ALL')
+    search = request.args.get('search', '')
+    page = int(request.args.get('page', 1))
+    per_page = 10 # 페이지당 보여줄 개수
 
+    conn = sqlite3.connect('safile.db')
+    cursor = conn.cursor()
+
+    # 1. 필터링된 전체 데이터 개수 및 통계 계산
+    base_query = "SELECT * FROM history WHERE user_id = ?"
+    params = [user_id]
+    
+    if status_filter != 'ALL':
+        base_query += " AND status = ?"
+        params.append(status_filter)
+    if search:
+        base_query += " AND filename LIKE ?"
+        params.append(f"%{search}%")
+
+    cursor.execute(base_query.replace("*", "COUNT(*)"), params)
+    total_count = cursor.fetchone()[0]
+    total_pages = (total_count + per_page - 1) // per_page
+
+    # 통계용 쿼리
+    cursor.execute("SELECT status, COUNT(*) FROM history WHERE user_id = ? GROUP BY status", (user_id,))
+    stats_data = dict(cursor.fetchall())
+    stats = {
+        'total': total_count,
+        'safe': stats_data.get('SAFE', 0),
+        'warning': stats_data.get('WARNING', 0),
+        'blocked': stats_data.get('BLOCKED', 0)
+    }
+
+    # 2. 페이징 처리된 리스트 가져오기
+    offset = (page - 1) * per_page
+    query = base_query + " ORDER BY timestamp DESC LIMIT ? OFFSET ?"
+    cursor.execute(query, params + [per_page, offset])
+    uploads = cursor.fetchall()
+    conn.close()
+
+    # 데이터 객체화
+    upload_list = [{"id": u[0], "filename": u[2], "result": u[3], "risk": u[4], "created_at": u[6]} for u in uploads]
+
+    return render_template('history.html', 
+                           uploads=upload_list, 
+                           stats=stats, 
+                           status_filter=status_filter, 
+                           search=search, 
+                           page=page, 
+                           total_pages=total_pages)
 # 🎯 [10번 필터 구현] SAFE, WARNING, BLOCKED 조건별 조회 라우터 추가
 @app.route('/history/filter/<status>')
 def history_filter(status):
@@ -439,3 +481,18 @@ def policy():
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
+
+
+@app.before_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
+    if user_id:
+        # 간단한 사용자 객체 생성 (실제 DB 조회도 가능)
+        class CurrentUser:
+            def __init__(self, id, username):
+                self.id = id
+                self.username = username
+                self.is_authenticated = True
+        g.current_user = CurrentUser(user_id, session.get('username'))
+    else:
+        g.current_user = None

@@ -1,482 +1,163 @@
-```html
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAFILE - Security Dashboard</title>
-
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* 1. 사이드바 오버레이 (평소엔 숨김) */
-        .sidebar-drawer-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: rgba(2, 6, 17, 0.8); z-index: 1000;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-        }
-        .sidebar-drawer-overlay.open { opacity: 1; pointer-events: auto; }
-    
-        /* 2. 사이드바 본체 (왼쪽 밖으로 밀어냄) */
-        .app-sidebar-drawer {
-            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
-            background-color: #0b1329; border-right: 1px solid #1e293b;
-            transition: left 0.3s ease; z-index: 1001;
-        }
-        .sidebar-drawer-overlay.open .app-sidebar-drawer { left: 0; }
-    
-        
-
-    </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <link rel="stylesheet"
-    href="{{ url_for('static', filename='style.css') }}">
-</head>
-
-<body class="dashboard-body"> 
-    <div class="app-wrapper">
-        
-        <header class="top-navbar-header" style="display: flex; align-items: center; height: 60px; background-color: #0b1329; border-bottom: 1px solid #1e293b; padding: 0 24px; position: sticky; top: 0; z-index: 50;">
-            <button id="sidebar-open-toggle" class="menu-toggle-hamburger-btn" style="background:none; border:none; color:white; cursor:pointer;">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <div style="font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-left: 16px;">
-                <i class="fa-solid fa-shield-halved" style="color: #3b82f6;"></i> SAFILE
-            </div>
-        </header>
-
-        <div id="sidebar-overlay-mask" class="sidebar-drawer-overlay">
-            <aside class="app-sidebar-drawer">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px;">
-                    <div style="font-size: 1.4rem; font-weight: 800; color: #f1f5f9; display: flex; align-items: center; gap: 10px;">
-                        <i class="fa-solid fa-shield-halved" style="color: #3b82f6;"></i> SAFILE
-                    </div>
-                    <button id="sidebar-close-toggle" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-                
-                <ul class="sidebar-menu" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px;">
-                    <li class="sidebar-menu-item active">
-                        <a href="/dashboard" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; color: #ffffff; background-color: #1d4ed8; text-decoration: none; border-radius: 8px;">
-                            <i class="fa-solid fa-house"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="sidebar-menu-item">
-                        <a href="/history" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; color: #94a3b8; text-decoration: none; border-radius: 8px;">
-                            <i class="fa-solid fa-clock-rotate-left"></i> History
-                        </a>
-                    </li>
-                </ul>
-            </aside>
-        </div>
-
-        <main class="dashboard-layout" style="padding: 24px;">
-            <div class="dashboard-header">
-                <h1>Security Dashboard</h1>
-                <p>Monitor your file upload security in real-time</p>
-            </div>
-    <!-- 통계 카드 -->
-
-    <div class="stats-grid">
-
-        <div class="stat-card">
-            <div class="stat-card-top">
-                <div class="icon-wrapper blue-bg">
-                    <i class="fa-solid fa-upload text-blue"></i>
-                </div>
-                <span class="change-tag text-green"></span>
-            </div>
-
-            <div class="stat-title">Total Uploads</div>
-
-            <div class="stat-value">
-                {{ total_uploads }}
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card-top">
-                <div class="icon-wrapper green-bg">
-                    <i class="fa-solid fa-circle-check text-green"></i>
-                </div>
-
-                <span class="change-tag text-green"></span>
-            </div>
-
-            <div class="stat-title">Safe Files</div>
-
-            <div class="stat-value">
-                {{ safe_files }}
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card-top">
-                <div class="icon-wrapper red-bg">
-                    <i class="fa-solid fa-circle-xmark text-red"></i>
-                </div>
-
-                <span class="change-tag text-red"></span>
-            </div>
-
-            <div class="stat-title">Blocked Files</div>
-
-            <div class="stat-value">
-                {{ blocked_files }}
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-card-top">
-                <div class="icon-wrapper yellow-bg">
-                    <i class="fa-solid fa-triangle-exclamation text-yellow"></i>
-                </div>
-
-                <span class="change-tag text-green"></span>
-            </div>
-
-            <div class="stat-title">Warnings</div>
-
-            <div class="stat-value">
-                {{ warning_files }}
-            </div>
-        </div>
-
-    </div>
-
-    <!-- 차트 -->
-
-    <div class="chart-container-box">
-
-        <div class="chart-header-flex">
-
-            <div class="chart-title-left">
-                <i class="fa-solid fa-chart-line text-blue"></i>
-                <h2>Upload Trend (7 Days)</h2>
-            </div>
-
-            <div class="chart-legend-right">
-                <span class="legend-item">
-                    <span class="dot safe-dot"></span>Safe
-                </span>
-
-                <span class="legend-item">
-                    <span class="dot warning-dot"></span>Warning
-                </span>
-
-                <span class="legend-item">
-                    <span class="dot blocked-dot"></span>Blocked
-                </span>
-            </div>
-
-        </div>
-
-        <div class="chart-canvas-wrapper">
-            <canvas id="uploadTrendChart"></canvas>
-        </div>
-
-    </div>
-
-    <!-- 하단 -->
-
-    <div class="bottom-split-grid">
-
-        <!-- Recent Uploads -->
-
-        <div class="recent-uploads-box">
-
-            <div class="recent-box-header">
-
-                <div class="recent-title-left">
-                    <i class="fa-regular fa-clock text-blue"></i>
-                    <h2>Recent Uploads</h2>
-                </div>
-
-                <a href="/history" class="view-all-link">
-                    View All
-                </a>
-
-            </div>
-
-            <div class="uploads-stack-list">
-
-                {% for upload in recent_uploads %}
-
-                <a href="/result" class="upload-item-row">
-
-                    <div class="item-info-left">
-
-                        <div class="file-name-text">
-                            {{ upload.filename }}
-                        </div>
-
-                        <div class="time-stamp-text">
-                            {{ upload.time }}
-                        </div>
-
-                    </div>
-
-                    <div class="item-tags-right">
-
-                        {% if upload.result == "SAFE" %}
-
-                            <span class="status-badge safe-badge">
-                                SAFE
-                            </span>
-
-                            <span class="risk-text text-green">
-                                {{ upload.risk }}
-                            </span>
-
-                        {% elif upload.result == "WARNING" %}
-
-                            <span class="status-badge warning-badge">
-                                WARNING
-                            </span>
-
-                            <span class="risk-text text-yellow">
-                                {{ upload.risk }}
-                            </span>
-
-                        {% else %}
-
-                            <span class="status-badge blocked-badge">
-                                BLOCKED
-                            </span>
-
-                            <span class="risk-text text-red">
-                                {{ upload.risk }}
-                            </span>
-
-                        {% endif %}
-
-                    </div>
-
-                </a>
-
-                {% endfor %}
-
-            </div>
-
-        </div>
-
-        <!-- 오른쪽 영역 -->
-
-        <div class="side-stack-layout">
-
-            <!-- 프로필 -->
-
-            <div class="profile-gradient-card">
-
-                <div class="profile-flex-header">
-
-                    <div class="profile-avatar">
-                        User
-                    </div>
-
-                    <div class="profile-text-info">
-
-                        <h3>{{ username }}</h3>
-
-                        <p class="role-admin-text">
-                            User
-                        </p>
-
-                        <div class="meta-info-lines">
-
-                            <div>
-                                <i class="fa-regular fa-envelope"></i>
-                                {{ email }}
-                            </div>
-
-                            
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="profile-stats-bottom">
-
-                    <div class="sub-stat-unit">
-                        <div class="sub-stat-num">
-                            {{ total_uploads }}
-                        </div>
-
-                        <div class="sub-stat-label">
-                            Total Uploads
-                        </div>
-                    </div>
-
-                    <div class="sub-stat-unit">
-                        <div class="sub-stat-num">
-                            {{ blocked_files }}
-                        </div>
-
-                        <div class="sub-stat-label">
-                            Blocked
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- Quick Actions -->
-
-            <div class="quick-actions-card">
-
-                <h2>Quick Actions</h2>
-
-                <div class="action-buttons-stack">
-
-                    <a href="/upload" class="action-btn blue-action">
-                        <i class="fa-solid fa-upload"></i>
-                        <span>Upload New File</span>
-                    </a>
-
-                    <a href="/policy" class="action-btn dark-action">
-                        <i class="fa-solid fa-shield-halved"></i>
-                        <span>View Policies</span>
-                    </a>
-
-                </div>
-
-            </div>
-
-            <!-- 시스템 상태 -->
-
-            <div class="system-status-card">
-
-                <div class="status-card-header">
-                    <i class="fa-solid fa-pulse text-green"></i>
-                    <h2>System Status</h2>
-                </div>
-
-                <div class="status-lines-list">
-
-                    <div class="status-row-line">
-                        <span>Scan Engine</span>
-                        <span class="text-green status-bold">
-                            Operational
-                        </span>
-                    </div>
-
-                    <div class="status-row-line">
-                        <span>Database</span>
-                        <span class="text-green status-bold">
-                            Healthy
-                        </span>
-                    </div>
-
-                    <div class="status-row-line">
-                        <span>API Response</span>
-                        <span class="text-green status-bold">
-                            45ms
-                        </span>
-                    </div>
-
-                    <div class="status-row-line">
-                        <span>Uptime</span>
-                        <span class="text-green status-bold">
-                            99.9%
-                        </span>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- 보안 배너 -->
-
-    <div class="security-notice-banner">
-
-        <div class="banner-flex-layout">
-
-            <div class="banner-icon-box">
-                <i class="fa-solid fa-triangle-exclamation text-blue"></i>
-            </div>
-
-            <div class="banner-content-text">
-
-                <h3>Security Notice</h3>
-
-                <p>
-                    Your security policies have blocked
-                    {{ blocked_files }}
-                    potentially malicious files this month.
-                </p>
-
-                <a href="/history" class="banner-action-link">
-                    Review Blocked Files →
-                </a>
-
-            </div>
-
-        </div>
-
-    </div>
-
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Security Dashboard</h1>
+    <p>Monitor your file upload security in real-time</p>
 </div>
 
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <div class="icon-wrapper blue-bg"><i class="fa-solid fa-upload text-blue"></i></div>
+            <span class="change-tag text-green">+12.5%</span>
+        </div>
+        <div class="stat-title">Total Uploads</div>
+        <div class="stat-value">{{ total_uploads }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <div class="icon-wrapper green-bg"><i class="fa-solid fa-circle-check text-green"></i></div>
+            <span class="change-tag text-green">+8.2%</span>
+        </div>
+        <div class="stat-title">Safe Files</div>
+        <div class="stat-value">{{ safe_files }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <div class="icon-wrapper red-bg"><i class="fa-solid fa-circle-xmark text-red"></i></div>
+            <span class="change-tag text-red">-3.1%</span>
+        </div>
+        <div class="stat-title">Blocked Files</div>
+        <div class="stat-value">{{ blocked_files }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <div class="icon-wrapper yellow-bg"><i class="fa-solid fa-triangle-exclamation text-yellow"></i></div>
+            <span class="change-tag text-green">+1.4%</span>
+        </div>
+        <div class="stat-title">Warnings</div>
+        <div class="stat-value">{{ warning_files }}</div>
+    </div>
+</div>
+
+<div class="chart-container-box">
+    <div class="chart-header-flex">
+        <div class="chart-title-left">
+            <i class="fa-solid fa-chart-line text-blue"></i>
+            <h2>Upload Trend (7 Days)</h2>
+        </div>
+        <div class="chart-legend-right">
+            <span class="legend-item"><span class="dot safe-dot"></span>Safe</span>
+            <span class="legend-item"><span class="dot warning-dot"></span>Warning</span>
+            <span class="legend-item"><span class="dot blocked-dot"></span>Blocked</span>
+        </div>
+    </div>
+    <div class="chart-canvas-wrapper">
+        <canvas id="uploadTrendChart"></canvas>
+    </div>
+</div>
+
+<div class="bottom-split-grid">
+    <div class="recent-uploads-box">
+        <div class="recent-box-header">
+            <div class="recent-title-left">
+                <i class="fa-regular fa-clock text-blue"></i>
+                <h2>Recent Uploads</h2>
+            </div>
+            <a href="{{ url_for('history') }}" class="view-all-link">View All</a>
+        </div>
+        <div class="uploads-stack-list">
+            {% for upload in recent_uploads %}
+            <a href="{{ url_for('history') }}" class="upload-item-row">
+                <div class="item-info-left">
+                    <div class="file-name-text">{{ upload.filename }}</div>
+                    <div class="time-stamp-text">{{ upload.time }}</div>
+                </div>
+                <div class="item-tags-right">
+                    {% if upload.result == 'SAFE' %}
+                        <span class="status-badge safe-badge">SAFE</span>
+                        <span class="risk-text text-green">{{ upload.risk }}</span>
+                    {% elif upload.result == 'WARNING' %}
+                        <span class="status-badge warning-badge">WARNING</span>
+                        <span class="risk-text text-yellow">{{ upload.risk }}</span>
+                    {% else %}
+                        <span class="status-badge blocked-badge">BLOCKED</span>
+                        <span class="risk-text text-red">{{ upload.risk }}</span>
+                    {% endif %}
+                </div>
+            </a>
+            {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-inbox" style="font-size:2rem;color:#334155;margin-bottom:0.5rem;"></i>
+                <p style="color:#64748b;margin:0;">No uploads yet. <a href="{{ url_for('upload') }}" style="color:#3b82f6;">Upload your first file</a></p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="side-stack-layout">
+        <div class="quick-actions-card">
+            <h2>Quick Actions</h2>
+            <div class="action-buttons-stack">
+                <a href="{{ url_for('upload') }}" class="action-btn blue-action">
+                    <i class="fa-solid fa-upload"></i><span>Upload New File</span>
+                </a>
+                <a href="{{ url_for('policy') }}" class="action-btn dark-action">
+                    <i class="fa-solid fa-shield-halved"></i><span>View Policies</span>
+                </a>
+            </div>
+        </div>
+        <div class="system-status-card">
+            <div class="status-card-header">
+                <i class="fa-solid fa-circle text-green" style="font-size:0.6rem;"></i>
+                <h2>System Status</h2>
+            </div>
+            <div class="status-lines-list">
+                <div class="status-row-line"><span>Scan Engine</span><span class="text-green status-bold">Operational</span></div>
+                <div class="status-row-line"><span>Database</span><span class="text-green status-bold">Healthy</span></div>
+                <div class="status-row-line"><span>API Response</span><span class="text-green status-bold">45ms</span></div>
+                <div class="status-row-line"><span>Uptime</span><span class="text-green status-bold">99.9%</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="security-notice-banner">
+    <div class="banner-flex-layout">
+        <div class="banner-icon-box"><i class="fa-solid fa-triangle-exclamation text-blue"></i></div>
+        <div class="banner-content-text">
+            <h3>Security Notice</h3>
+            <p>Your security policies have blocked <strong>{{ blocked_files }}</strong> potentially malicious files this month.</p>
+            <a href="{{ url_for('history') }}?status=BLOCKED" class="banner-action-link">Review Blocked Files →</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
 <script>
-    // 1. 차트 스크립트 (기존 내용)
-    const ctx = document.getElementById('uploadTrendChart').getContext('2d');
-    const uploadTrendChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            datasets: [
-                { label: 'Safe', data: [45, 52, 48, 61, 55, 40, 38], borderColor: '#4ade80', borderWidth: 2, tension: 0.3, pointBackgroundColor: '#4ade80' },
-                { label: 'Warning', data: [5, 7, 6, 4, 8, 3, 2], borderColor: '#facc15', borderWidth: 2, tension: 0.3, pointBackgroundColor: '#facc15' },
-                { label: 'Blocked', data: [8, 6, 10, 7, 9, 5, 4], borderColor: '#f87171', borderWidth: 2, tension: 0.3, pointBackgroundColor: '#f87171' }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
-                y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
-            }
+const ctx = document.getElementById('uploadTrendChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+        datasets: [
+            { label:'Safe', data:[45,52,48,61,55,40,38], borderColor:'#4ade80', borderWidth:2, tension:0.3, pointBackgroundColor:'#4ade80', fill:false },
+            { label:'Warning', data:[5,7,6,4,8,3,2], borderColor:'#facc15', borderWidth:2, tension:0.3, pointBackgroundColor:'#facc15', fill:false },
+            { label:'Blocked', data:[8,6,10,7,9,5,4], borderColor:'#f87171', borderWidth:2, tension:0.3, pointBackgroundColor:'#f87171', fill:false }
+        ]
+    },
+    options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false } },
+        scales:{
+            x:{ grid:{color:'#334155'}, ticks:{color:'#94a3b8'} },
+            y:{ grid:{color:'#334155'}, ticks:{color:'#94a3b8'} }
         }
-    });
-
-    // 2. 사이드바 동작 스크립트 (추가된 부분)
-    document.addEventListener('DOMContentLoaded', function() {
-        const overlay = document.getElementById('sidebar-overlay-mask');
-        const openBtn = document.getElementById('sidebar-open-toggle');
-        const closeBtn = document.getElementById('sidebar-close-toggle');
-
-        if (openBtn) {
-            openBtn.addEventListener('click', function() {
-                overlay.classList.add('open');
-            });
-        }
-
-        if (closeBtn) {
-            closeBtn.addEventListener('click', function() {
-                overlay.classList.remove('open');
-            });
-        }
-
-        // 배경 클릭 시 닫기
-        overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) {
-                overlay.classList.remove('open');
-            }
-        });
-    });
+    }
+});
 </script>
+{% endblock %}
 
-</body>
-</html>
-```

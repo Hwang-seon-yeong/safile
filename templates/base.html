@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SAFILE{% endblock %} - Security Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}dashboard-body{% endblock %}">
+{% block body %}
+<div class="app-wrapper">
+    <!-- 고정 사이드바 -->
+    <aside class="app-sidebar">
+        <div class="sidebar-logo-area">
+            <div class="sidebar-logo-icon-wrap">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+                <div class="sidebar-brand-name">Safile</div>
+                <div class="sidebar-brand-version">v1.0</div>
+            </div>
+        </div>
+
+        <ul class="sidebar-nav-list">
+            <li>
+                <a href="{{ url_for('dashboard') }}" class="sidebar-nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-table-columns"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('upload') }}" class="sidebar-nav-link {% if request.endpoint == 'upload' %}active{% endif %}">
+                    <i class="fa-solid fa-upload"></i>
+                    <span>Upload File</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('history') }}" class="sidebar-nav-link {% if request.endpoint == 'history' %}active{% endif %}">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>Upload History</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('policy') }}" class="sidebar-nav-link {% if request.endpoint == 'policy' %}active{% endif %}">
+                    <i class="fa-regular fa-file-lines"></i>
+                    <span>Security Policy</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-user-footer">
+            <div class="sidebar-user-avatar">{{ (session.get('username') or 'D')[0].upper() }}</div>
+            
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name">{{ session.get('username') or 'Demo User' }}</div>
+                <div class="sidebar-user-email">{{ session.get('username', '').lower() + '@safile.local' }}</div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="sidebar-logout-btn" title="Logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content-area">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for cat, msg in messages %}
+                <div class="flash-msg flash-{{ cat }}">
+                    <i class="fa-solid {% if cat == 'error' %}fa-circle-xmark{% else %}fa-circle-check{% endif %}"></i>
+                    {{ msg }}
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}
+{% block scripts %}{% endblock %}
+</body>
+</html>
+
