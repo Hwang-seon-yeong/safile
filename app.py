@@ -106,55 +106,54 @@ class SecurityAlert:
 # 8) FileFilter 클래스 (조건별 필터링 조회 구현)
 class FileFilter:
     @staticmethod
-    def filter_by_status(status_criterion):
+    def filter_by_status(user_id, status_criterion): # user_id 추가
         conn = sqlite3.connect('safile.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM history WHERE status = ? ORDER BY timestamp DESC', (status_criterion,))
+        cursor.execute('SELECT * FROM history WHERE status = ? AND user_id = ? ORDER BY timestamp DESC', (status_criterion, user_id))
         rows = cursor.fetchall()
         conn.close()
-        return [UploadRecord(r[0], r[1], r[2], r[3], r[4], r[5]) for r in rows]
+        return [UploadRecord(r[0], r[2], r[3], r[4], r[5], r[6]) for r in rows]
 
 
 # 9) HistorySearch 클래스 (파일명 검색 및 결과 관리 구현)
 class HistorySearch:
     @staticmethod
-    def get_all_history():
+    def get_all_history(user_id): # user_id 인자 추가
         conn = sqlite3.connect('safile.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM history ORDER BY timestamp DESC')
+        cursor.execute('SELECT * FROM history WHERE user_id = ? ORDER BY timestamp DESC', (user_id,))
         rows = cursor.fetchall()
         conn.close()
-        return [UploadRecord(r[0], r[1], r[2], r[3], r[4], r[5]) for r in rows]
+        return [UploadRecord(r[0], r[2], r[3], r[4], r[5], r[6]) for r in rows] # 인덱스 주의(r[1]이 user_id가 됨)
 
     @staticmethod
-    def search_by_filename(keyword):
+    def search_by_filename(user_id, keyword): # user_id 추가
         conn = sqlite3.connect('safile.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM history WHERE filename LIKE ? ORDER BY timestamp DESC', (f"%{keyword}%",))
+        cursor.execute('SELECT * FROM history WHERE user_id = ? AND filename LIKE ? ORDER BY timestamp DESC', (user_id, f"%{keyword}%"))
         rows = cursor.fetchall()
         conn.close()
         return [UploadRecord(r[0], r[1], r[2], r[3], r[4], r[5]) for r in rows]
 
 
 # 10) FileDeletion 클래스 (삭제 성공/실패 에러 제어 구현)
+# 10) FileDeletion 클래스 (삭제 성공/실패 에러 제어 구현)
 class FileDeletion:
     @staticmethod
-    def delete_record(record_id):
+    def delete_record(record_id, user_id): # 1. user_id 인자를 추가합니다.
         try:
             conn = sqlite3.connect('safile.db')
             cursor = conn.cursor()
-            # 해당 기록이 존재하는지 먼저 확인
-            cursor.execute('SELECT filename FROM history WHERE id = ?', (record_id,))
-            row = cursor.fetchone()
             
-            if not row:
-                conn.close()
-                return False, "삭제 실패: 해당 업로드 기록을 찾을 수 없습니다."
-                
-            cursor.execute('DELETE FROM history WHERE id = ?', (record_id,))
+            # 2. 삭제 시 본인의 데이터인지 확인하는 조건(user_id)을 추가합니다.
+            cursor.execute('DELETE FROM history WHERE id = ? AND user_id = ?', (record_id, user_id))
             conn.commit()
+            
+            # 3. 실제로 삭제된 행이 있는지 확인합니다.
+            deleted = cursor.rowcount > 0 
             conn.close()
-            return True, "삭제 성공"
+            
+            return deleted, ("삭제 성공" if deleted else "삭제 실패: 권한이 없거나 기록을 찾을 수 없습니다.")
         except sqlite3.Error as e:
             return False, f"삭제 과정에서 데이터베이스 오류가 발생했습니다: {str(e)}"
 
@@ -193,26 +192,24 @@ class AuthenticationService:
 def init_db():
     conn = sqlite3.connect('safile.db')
     cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
-        )
-    ''')
+    # ... users 테이블은 그대로 유지 ...
+    
+    # 기존 history 테이블을 지우고 새로 생성 (user_id 추가)
+    cursor.execute('DROP TABLE IF EXISTS history')
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
             filename TEXT NOT NULL,
             status TEXT NOT NULL,
             risk TEXT NOT NULL,
             reason TEXT NOT NULL,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(id)
         )
     ''')
     conn.commit()
     conn.close()
-
 init_db()
 
 
@@ -261,27 +258,29 @@ def dashboard():
         return redirect(url_for('login'))
     
     username = session.get('username', 'Admin')
-    email = f"{username.lower()}@safile.local"  # 화면 가독성을 위한 가상 메일 포맷
+    current_user_id = session.get('user_id') # 이 부분이 빠져 있었습니다!
+    email = f"{username.lower()}@safile.local"
+
     
     try:
         conn = sqlite3.connect('safile.db')
         cursor = conn.cursor()
         
         # 1. 상단 대시보드 위젯 카운팅 연동
-        cursor.execute('SELECT COUNT(*) FROM history')
+        cursor.execute('SELECT COUNT(*) FROM history WHERE user_id = ?', (current_user_id,))
         total_uploads = cursor.fetchone()[0]
         
-        cursor.execute("SELECT COUNT(*) FROM history WHERE status = 'SAFE'")
+        cursor.execute("SELECT COUNT(*) FROM history WHERE status = 'SAFE' AND user_id = ?", (current_user_id,))
         safe_files = cursor.fetchone()[0]
         
-        cursor.execute("SELECT COUNT(*) FROM history WHERE status = 'BLOCKED'")
+        cursor.execute("SELECT COUNT(*) FROM history WHERE status = 'BLOCKED' AND user_id = ?", (current_user_id,))
         blocked_files = cursor.fetchone()[0]
         
-        cursor.execute("SELECT COUNT(*) FROM history WHERE status = 'WARNING'")
+        cursor.execute("SELECT COUNT(*) FROM history WHERE status = 'WARNING' AND user_id = ?", (current_user_id,))
         warning_files = cursor.fetchone()[0]
         
-        # 2. 하단 실시간 최근 이력(Recent Uploads) 5개 매핑 연동
-        cursor.execute('SELECT filename, status, risk, timestamp FROM history ORDER BY timestamp DESC LIMIT 5')
+        # 최근 내역 5개도 내 데이터만 조회
+        cursor.execute('SELECT filename, status, risk, timestamp FROM history WHERE user_id = ? ORDER BY timestamp DESC LIMIT 5', (current_user_id,))
         rows = cursor.fetchall()
         conn.close()
         
@@ -314,8 +313,12 @@ def dashboard():
 # 파일 업로드 (2번 FileUpload 데이터 및 이중 확장자 보안 스캔 완벽 구동)
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
+    # 1. 로그인 여부 확인
     if 'username' not in session:
         return redirect(url_for('login'))
+
+    # 2. 현재 로그인한 사용자의 ID 가져오기
+    current_user_id = session.get('user_id')
 
     if request.method == 'POST':
         if 'filename_only' in request.form:
@@ -324,8 +327,9 @@ def upload():
             
             conn = sqlite3.connect('safile.db')
             cursor = conn.cursor()
-            cursor.execute('INSERT INTO history (filename, status, risk, reason) VALUES (?, ?, ?, ?)', 
-                           (filename, status, risk, reason))
+            # 수정: user_id를 함께 INSERT
+            cursor.execute('INSERT INTO history (user_id, filename, status, risk, reason) VALUES (?, ?, ?, ?, ?)', 
+                           (current_user_id, filename, status, risk, reason))
             conn.commit()
             conn.close()
             return jsonify({"filename": filename, "status": status, "risk": risk, "reason": reason})
@@ -352,15 +356,16 @@ def upload():
             # 🎯 업데이트된 이중 확장자 탐지 로직으로 정밀 보안 검사 수행
             scan_result = SecurityScanService.evaluate(file_obj.file_name, policy)
 
-            if scan_result.status == 'WARNING':
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            elif scan_result.status == 'SAFE':
+            if scan_result.status in ['WARNING', 'SAFE']:
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
             conn = sqlite3.connect('safile.db')
             cursor = conn.cursor()
-            cursor.execute('INSERT INTO history (filename, status, risk, reason) VALUES (?, ?, ?, ?)', 
-                           (filename, scan_result.status, scan_result.risk_level, scan_result.blocked_reason))
+            # 수정: user_id를 함께 INSERT
+            cursor.execute('''
+                INSERT INTO history (user_id, filename, status, risk, reason) 
+                VALUES (?, ?, ?, ?, ?)
+            ''', (current_user_id, filename, scan_result.status, scan_result.risk_level, scan_result.blocked_reason))
             conn.commit()
             conn.close()
 
@@ -380,19 +385,15 @@ def history():
     if 'username' not in session:
         return redirect(url_for('login'))
     
+    user_id = session.get('user_id')
     search_keyword = request.args.get('search', '').strip()
-    error_msg = ""
     
     if search_keyword:
-        # HistorySearch 클래스를 호출하여 검색 수행
-        records = HistorySearch.search_by_filename(search_keyword)
-        if not records:
-            error_msg = "검색 결과가 존재하지 않습니다."
+        records = HistorySearch.search_by_filename(user_id, search_keyword)
     else:
-        records = HistorySearch.get_all_history()
+        records = HistorySearch.get_all_history(user_id)
         
-    return render_template('history.html', records=records, error_msg=error_msg)
-
+    return render_template('history.html', records=records)
 
 # 🎯 [10번 필터 구현] SAFE, WARNING, BLOCKED 조건별 조회 라우터 추가
 @app.route('/history/filter/<status>')
@@ -400,7 +401,8 @@ def history_filter(status):
     if 'username' not in session:
         return redirect(url_for('login'))
     
-    filtered_records = FileFilter.filter_by_status(status.upper())
+    user_id = session.get('user_id') # 추가
+    filtered_records = FileFilter.filter_by_status(user_id, status.upper()) # user_id 전달
     return render_template('history.html', records=filtered_records, error_msg="")
 
 
@@ -410,14 +412,16 @@ def delete_history(record_id):
     if 'username' not in session:
         return redirect(url_for('login'))
     
-    success, msg = FileDeletion.delete_record(record_id)
+    # 4. 세션에서 현재 user_id를 가져와서 전달해야 합니다.
+    user_id = session.get('user_id') 
+    success, msg = FileDeletion.delete_record(record_id, user_id)
+    
     if success:
         flash("기록이 안전하게 삭제되었습니다.")
     else:
-        flash(msg) # 에러 메시지 출력 처리 완료
+        flash(msg)
         
     return redirect(url_for('history'))
-
 
 @app.route('/result')
 def result():

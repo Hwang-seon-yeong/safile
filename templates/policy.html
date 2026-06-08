@@ -5,9 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAFILE - Security Policy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { color: #e2e8f0 !important; }
+        h1, h2, h3, .stat-value, .feature-item-title, .rule-row-item span { color: #ffffff !important; }
+        .text-slate-400, .policy-card-desc, .comp-desc { color: #94a3b8 !important; }
+    
+        /* --- 레이아웃 밀림 해결 코드 --- */
+        .policy-card-top {
+            display: flex !important;      /* 부모를 Flex로 */
+            align-items: center !important; /* 아이콘과 텍스트 수직 중앙 정렬 */
+            gap: 16px !important;           /* 아이콘과 제목 사이 간격 */
+            height: auto !important;
+        }
+        
+        .policy-title-flex {
+            display: flex !important;      /* 자식 내부도 Flex로 */
+            align-items: center !important;
+            gap: 15px !important;
+            width: 100% !important;
+        }
+    
+        .policy-avatar {
+            flex-shrink: 0;                /* 아이콘이 찌그러지지 않게 고정 */
+        }
+    </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="dashboard-body">
+
+    <div class="sidebar-drawer-overlay"></div>
+    <nav class="app-sidebar-drawer">
+        <div class="sidebar-brand-node">SAFILE Admin</div>
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/policy" class="nav-link active">Security Policy</a>
+        <a href="/history" class="nav-link">Upload History</a>
+    </nav>
+    <div class="dashboard-layout max-w-4xl">
+        </div>
+</body>
 
     <div class="dashboard-layout max-w-4xl">
         <div class="policy-top-flex">
@@ -195,5 +230,32 @@
         </div>
     </div>
 
+    <script>
+        const overlay = document.getElementById('sidebar-overlay-mask');
+        // 'sidebar-open-toggle' 버튼이 대시보드 상단에 있다고 가정
+        const openBtn = document.getElementById('sidebar-open-toggle'); 
+        const closeBtn = document.getElementById('sidebar-close-toggle');
+
+        // 열기
+        if (openBtn) {
+            openBtn.addEventListener('click', () => {
+                overlay.classList.add('open');
+            });
+        }
+
+        // 닫기 (X 버튼)
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                overlay.classList.remove('open');
+            });
+        }
+
+        // 닫기 (배경 클릭 시)
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove('open');
+            }
+        });
+    </script>
 </body>
-</html>
+</html>   

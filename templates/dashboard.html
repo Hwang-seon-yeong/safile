@@ -8,6 +8,26 @@
 
     <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 1. 사이드바 오버레이 (평소엔 숨김) */
+        .sidebar-drawer-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(2, 6, 17, 0.8); z-index: 1000;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .sidebar-drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    
+        /* 2. 사이드바 본체 (왼쪽 밖으로 밀어냄) */
+        .app-sidebar-drawer {
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+            background-color: #0b1329; border-right: 1px solid #1e293b;
+            transition: left 0.3s ease; z-index: 1001;
+        }
+        .sidebar-drawer-overlay.open .app-sidebar-drawer { left: 0; }
+    
+        
+
+    </style>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -15,15 +35,49 @@
     href="{{ url_for('static', filename='style.css') }}">
 </head>
 
-<body class="dashboard-body">
+<body class="dashboard-body"> 
+    <div class="app-wrapper">
+        
+        <header class="top-navbar-header" style="display: flex; align-items: center; height: 60px; background-color: #0b1329; border-bottom: 1px solid #1e293b; padding: 0 24px; position: sticky; top: 0; z-index: 50;">
+            <button id="sidebar-open-toggle" class="menu-toggle-hamburger-btn" style="background:none; border:none; color:white; cursor:pointer;">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div style="font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-left: 16px;">
+                <i class="fa-solid fa-shield-halved" style="color: #3b82f6;"></i> SAFILE
+            </div>
+        </header>
 
-<div class="dashboard-layout">
+        <div id="sidebar-overlay-mask" class="sidebar-drawer-overlay">
+            <aside class="app-sidebar-drawer">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px;">
+                    <div style="font-size: 1.4rem; font-weight: 800; color: #f1f5f9; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-shield-halved" style="color: #3b82f6;"></i> SAFILE
+                    </div>
+                    <button id="sidebar-close-toggle" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                
+                <ul class="sidebar-menu" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+                    <li class="sidebar-menu-item active">
+                        <a href="/dashboard" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; color: #ffffff; background-color: #1d4ed8; text-decoration: none; border-radius: 8px;">
+                            <i class="fa-solid fa-house"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="sidebar-menu-item">
+                        <a href="/history" style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; color: #94a3b8; text-decoration: none; border-radius: 8px;">
+                            <i class="fa-solid fa-clock-rotate-left"></i> History
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+        </div>
 
-    <div class="dashboard-header">
-        <h1>Security Dashboard</h1>
-        <p>Monitor your file upload security in real-time</p>
-    </div>
-
+        <main class="dashboard-layout" style="padding: 24px;">
+            <div class="dashboard-header">
+                <h1>Security Dashboard</h1>
+                <p>Monitor your file upload security in real-time</p>
+            </div>
     <!-- 통계 카드 -->
 
     <div class="stats-grid">
@@ -33,7 +87,7 @@
                 <div class="icon-wrapper blue-bg">
                     <i class="fa-solid fa-upload text-blue"></i>
                 </div>
-                <span class="change-tag text-green">+12.5%</span>
+                <span class="change-tag text-green"></span>
             </div>
 
             <div class="stat-title">Total Uploads</div>
@@ -49,7 +103,7 @@
                     <i class="fa-solid fa-circle-check text-green"></i>
                 </div>
 
-                <span class="change-tag text-green">+8.2%</span>
+                <span class="change-tag text-green"></span>
             </div>
 
             <div class="stat-title">Safe Files</div>
@@ -65,7 +119,7 @@
                     <i class="fa-solid fa-circle-xmark text-red"></i>
                 </div>
 
-                <span class="change-tag text-red">-3.1%</span>
+                <span class="change-tag text-red"></span>
             </div>
 
             <div class="stat-title">Blocked Files</div>
@@ -81,7 +135,7 @@
                     <i class="fa-solid fa-triangle-exclamation text-yellow"></i>
                 </div>
 
-                <span class="change-tag text-green">+1.4%</span>
+                <span class="change-tag text-green"></span>
             </div>
 
             <div class="stat-title">Warnings</div>
@@ -220,7 +274,7 @@
                 <div class="profile-flex-header">
 
                     <div class="profile-avatar">
-                        HS
+                        User
                     </div>
 
                     <div class="profile-text-info">
@@ -228,7 +282,7 @@
                         <h3>{{ username }}</h3>
 
                         <p class="role-admin-text">
-                            Administrator
+                            User
                         </p>
 
                         <div class="meta-info-lines">
@@ -238,10 +292,7 @@
                                 {{ email }}
                             </div>
 
-                            <div>
-                                <i class="fa-regular fa-calendar-days"></i>
-                                Member since Jan 2026
-                            </div>
+                            
 
                         </div>
 
@@ -377,76 +428,53 @@
 </div>
 
 <script>
-
-const ctx = document.getElementById('uploadTrendChart').getContext('2d');
-
-const uploadTrendChart = new Chart(ctx, {
-
-    type: 'line',
-
-    data: {
-
-        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-
-        datasets: [
-
-            {
-                label: 'Safe',
-                data: [45, 52, 48, 61, 55, 40, 38],
-                borderColor: '#4ade80',
-                borderWidth: 2,
-                tension: 0.3,
-                pointBackgroundColor: '#4ade80'
-            },
-
-            {
-                label: 'Warning',
-                data: [5, 7, 6, 4, 8, 3, 2],
-                borderColor: '#facc15',
-                borderWidth: 2,
-                tension: 0.3,
-                pointBackgroundColor: '#facc15'
-            },
-
-            {
-                label: 'Blocked',
-                data: [8, 6, 10, 7, 9, 5, 4],
-                borderColor: '#f87171',
-                borderWidth: 2,
-                tension: 0.3,
-                pointBackgroundColor: '#f87171'
-            }
-
-        ]
-    },
-
-    options: {
-
-        responsive: true,
-        maintainAspectRatio: false,
-
-        plugins: {
-            legend: {
-                display: false
-            }
+    // 1. 차트 스크립트 (기존 내용)
+    const ctx = document.getElementById('uploadTrendChart').getContext('2d');
+    const uploadTrendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            datasets: [
+                { label: 'Safe', data: [45, 52, 48, 61, 55, 40, 38], borderColor: '#4ade80', borderWidth: 2, tension: 0.3, pointBackgroundColor: '#4ade80' },
+                { label: 'Warning', data: [5, 7, 6, 4, 8, 3, 2], borderColor: '#facc15', borderWidth: 2, tension: 0.3, pointBackgroundColor: '#facc15' },
+                { label: 'Blocked', data: [8, 6, 10, 7, 9, 5, 4], borderColor: '#f87171', borderWidth: 2, tension: 0.3, pointBackgroundColor: '#f87171' }
+            ]
         },
-
-        scales: {
-
-            x: {
-                grid: { color: '#334155' },
-                ticks: { color: '#94a3b8' }
-            },
-
-            y: {
-                grid: { color: '#334155' },
-                ticks: { color: '#94a3b8' }
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
             }
-
         }
-    }
-});
+    });
 
+    // 2. 사이드바 동작 스크립트 (추가된 부분)
+    document.addEventListener('DOMContentLoaded', function() {
+        const overlay = document.getElementById('sidebar-overlay-mask');
+        const openBtn = document.getElementById('sidebar-open-toggle');
+        const closeBtn = document.getElementById('sidebar-close-toggle');
+
+        if (openBtn) {
+            openBtn.addEventListener('click', function() {
+                overlay.classList.add('open');
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                overlay.classList.remove('open');
+            });
+        }
+
+        // 배경 클릭 시 닫기
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                overlay.classList.remove('open');
+            }
+        });
+    });
 </script>
 
 </body>
