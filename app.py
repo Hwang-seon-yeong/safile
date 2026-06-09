@@ -73,9 +73,11 @@ class SecurityScanService:
         clean_name = filename.strip().lower()
         
         # 2. 파일의 실제 타입(MIME) 검사 (보안의 첫 번째 방어선)
+        # 2. 파일의 실제 타입(MIME) 검사 (보안의 첫 번째 방어선)
         dangerous_mimes = [
             'application/x-msdownload', 
             'application/x-msdos-program', 
+            'application/x-dosexec',        # <--- 이 줄을 꼭 추가하세요!
             'application/octet-stream',
             'application/x-msi'
         ]
@@ -361,48 +363,39 @@ def upload():
     current_user_id = session.get('user_id')
 
     if request.method == 'POST':
-        if 'filename_only' in request.form:
-            filename = request.form.get('filename_only')
-            status, risk, reason = 'BLOCKED', 'HIGH', 'Dangerous file extension detected (Interception)'
-            
-            conn = sqlite3.connect('safile.db')
-            cursor = conn.cursor()
-            # 수정: user_id를 함께 INSERT
-            cursor.execute('INSERT INTO history (user_id, filename, status, risk, reason) VALUES (?, ?, ?, ?, ?)', 
-                           (current_user_id, filename, status, risk, reason))
-            conn.commit()
-            conn.close()
-            return jsonify({"filename": filename, "status": status, "risk": risk, "reason": reason})
-
+        # 파일이 업로드되었는지 확인
         if 'file' not in request.files:
-            return jsonify({"filename": "No File", "status": "BLOCKED", "risk": "HIGH", "reason": "No file selected"})
+            return jsonify({"status": "BLOCKED", "risk": "HIGH", "reason": "No file uploaded"})
 
         file = request.files['file']
         if file.filename == '':
-            return jsonify({"filename": "No File", "status": "BLOCKED", "risk": "HIGH", "reason": "No file selected"})
+            return jsonify({"status": "BLOCKED", "risk": "HIGH", "reason": "No file selected"})
 
         if file:
             filename = secure_filename(file.filename)
             
-            file_type = file.content_type  
+            # [보안 강화] 실제 파일 내용(헤더)을 메모리에서만 읽어 MIME 타입 판별
+            file_content = file.read(2048)  # 파일 앞부분 2KB 읽기
+            file.seek(0)                   # 파일 포인터를 다시 처음으로 복구
+            
+            # python-magic으로 실제 내용 분석
+            actual_mime_type = magic.from_buffer(file_content, mime=True)
+            print(f"DEBUG: 감지된 MIME 타입은 바로 이것입니다 -> {actual_mime_type}") # <--- 이 줄을 꼭 확인!
+            # 파일 크기 계산
             file.seek(0, os.SEEK_END)
             file_size = file.tell()        
             file.seek(0)                   
             
-            # FileUpload 객체 생성
-            file_obj = FileUpload(filename, file_type, file_size)
-
+            # 실제 분석된 MIME 타입으로 보안 검사 수행
             policy = SecurityPolicy()
-            # 🎯 여기서 'file_obj.file_type'을 반드시 전달해야 합니다!
-            scan_result = SecurityScanService.evaluate(file_obj.file_name, file_obj.file_type, policy)
+            scan_result = SecurityScanService.evaluate(filename, actual_mime_type, policy)
             
-            # ... (이후 저장 및 DB 기록 로직)
-            if scan_result.status in ['WARNING', 'SAFE']:
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # [중요] 파일을 서버 디스크에 저장(file.save)하는 로직을 완전히 제거했습니다.
+            # 이제 악성 파일은 메모리에서 검사 후 즉시 폐기됩니다.
 
+            # 데이터베이스에 검사 결과 기록
             conn = sqlite3.connect('safile.db')
             cursor = conn.cursor()
-            # 수정: user_id를 함께 INSERT
             cursor.execute('''
                 INSERT INTO history (user_id, filename, status, risk, reason) 
                 VALUES (?, ?, ?, ?, ?)
@@ -410,6 +403,7 @@ def upload():
             conn.commit()
             conn.close()
 
+            # 결과 반환
             return jsonify({
                 "filename": filename, 
                 "status": scan_result.status, 
@@ -418,7 +412,6 @@ def upload():
             })
 
     return render_template('upload.html')
-
 
 # 🎯 [8번 검색 구현] 파일명 검색 및 결과 부재 시 에러 메시지 출력 연동
 @app.route('/history')
