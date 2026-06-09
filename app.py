@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask import g
 from flask import redirect, url_for, flash, request
 import magic # 라이브러리 추가
+import re
 
 app = Flask(__name__)
 app.secret_key = 'safile_secret_key_for_session' # 로그인 세션 관리를 위한 비밀키 설정
@@ -68,8 +69,10 @@ class SecurityPolicy:
 class SecurityScanService:
     @staticmethod
     def evaluate(filename, file_type, policy):
-        # 1. 파일의 실제 타입(MIME)을 먼저 검사 (보안의 첫 번째 방어선)
-        # 실행 파일이나 바이너리 타입의 악성 파일 가능성 탐지
+        # 1. 파일명 정제 (양끝 공백 제거 및 소문자화)
+        clean_name = filename.strip().lower()
+        
+        # 2. 파일의 실제 타입(MIME) 검사 (보안의 첫 번째 방어선)
         dangerous_mimes = [
             'application/x-msdownload', 
             'application/x-msdos-program', 
@@ -84,13 +87,25 @@ class SecurityScanService:
                 blocked_reason='Malicious or unauthorized file type detected'
             )
 
-        # 2. 파일명을 점('.') 기준으로 쪼개기
+        # 3. 우회 공격 방어를 위한 정밀 탐지 (숨김 확장자 및 공백 우회)
+        # 정규표현식: 파일명 중간에 .exe, .sh 등이 숨어있는 경우를 탐지
+        for ext in policy.blocked_extensions:
+            # 패턴 설명: 점(.) + 확장자 + (공백문자 또는 점) 형태를 탐지
+            pattern = rf"\.{ext}(\s+|\.|$)"
+            if re.search(pattern, clean_name):
+                return ScanResult(
+                    status='BLOCKED', 
+                    risk_level='HIGH', 
+                    blocked_reason='Hidden or spoofed execution extension detected'
+                )
+
+        # 4. 파일명을 점('.') 기준으로 쪼개기
         parts = filename.split('.')
         status, risk, reason = 'SAFE', 'LOW', 'File uploaded successfully'
         
-        # 3. 이중 확장자 탐지 로직 (우회 공격 차단)
+        # 5. 이중 확장자 탐지 로직 (공격자가 여러 확장자를 겹쳐 사용할 경우)
         if len(parts) > 2:
-            middle_extensions = [p.lower() for p in parts[1:-1]]
+            middle_extensions = [p.lower().strip() for p in parts[1:-1]]
             for mid_ext in middle_extensions:
                 if mid_ext in policy.blocked_extensions:
                     return ScanResult(
@@ -99,15 +114,14 @@ class SecurityScanService:
                         blocked_reason='Dangerous double extension detected (Spoofing Alert)'
                     )
 
-        # 4. 일반 단일 확장자 검사 (가장 뒤쪽 최종 확장자 기준)
-        final_extension = parts[-1].lower()
+        # 6. 일반 단일 확장자 검사 (가장 뒤쪽 최종 확장자 기준)
+        final_extension = parts[-1].lower() if len(parts) > 1 else ""
         if final_extension in policy.blocked_extensions:
             status, risk, reason = 'BLOCKED', 'HIGH', 'Dangerous file extension detected'
         elif final_extension in ['zip', 'rar']:
             status, risk, reason = 'WARNING', 'MEDIUM', 'Compressed files require caution'
             
         return ScanResult(status=status, risk_level=risk, blocked_reason=reason)
-
 
 # 7) SecurityAlert 클래스 (경고 메시지 및 안내 생성)
 class SecurityAlert:
