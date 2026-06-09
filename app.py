@@ -209,10 +209,20 @@ class AuthenticationService:
 def init_db():
     conn = sqlite3.connect('safile.db')
     cursor = conn.cursor()
-    # ... users 테이블은 그대로 유지 ...
     
-    # 기존 history 테이블을 지우고 새로 생성 (user_id 추가)
-    cursor.execute('DROP TABLE IF EXISTS history')
+    # [수정] DROP TABLE 줄을 삭제하거나 주석 처리하세요.
+    # cursor.execute('DROP TABLE IF EXISTS history') 
+    
+    # CREATE TABLE IF NOT EXISTS만 남겨두면, 
+    # 테이블이 없으면 만들고 있으면 그냥 넘어갑니다.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
+        )
+    ''')
+    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -227,7 +237,6 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
-init_db()
 
 
 # ============================================================
