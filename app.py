@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import g
 from flask import redirect, url_for, flash, request
+import magic # 라이브러리 추가
 
 app = Flask(__name__)
 app.secret_key = 'safile_secret_key_for_session' # 로그인 세션 관리를 위한 비밀키 설정
@@ -66,25 +67,39 @@ class SecurityPolicy:
 # 6) SecurityScanService 클래스 (🎯 고도화: 이중 확장자 위장 공격 정밀 차단)
 class SecurityScanService:
     @staticmethod
-    def evaluate(filename, policy):
-        # 파일명을 점('.') 기준으로 전부 쪼개기
-        parts = filename.split('.')
+    def evaluate(filename, file_type, policy):
+        # 1. 파일의 실제 타입(MIME)을 먼저 검사 (보안의 첫 번째 방어선)
+        # 실행 파일이나 바이너리 타입의 악성 파일 가능성 탐지
+        dangerous_mimes = [
+            'application/x-msdownload', 
+            'application/x-msdos-program', 
+            'application/octet-stream',
+            'application/x-msi'
+        ]
         
-        # 1. 초기 기본 스캔 결과값 세팅
+        if file_type in dangerous_mimes:
+            return ScanResult(
+                status='BLOCKED', 
+                risk_level='HIGH', 
+                blocked_reason='Malicious or unauthorized file type detected'
+            )
+
+        # 2. 파일명을 점('.') 기준으로 쪼개기
+        parts = filename.split('.')
         status, risk, reason = 'SAFE', 'LOW', 'File uploaded successfully'
         
-        # 2. 이중 확장자 탐지 로직 (점의 개수가 2개 이상이고, 중간에 위험 확장자가 숨어있는지 정밀 추적)
+        # 3. 이중 확장자 탐지 로직 (우회 공격 차단)
         if len(parts) > 2:
-            # 맨 마지막 확장자를 제외한 중간 확장자들 추출 (예: abc.exe.txt -> 중간 배열에 'exe' 포착)
             middle_extensions = [p.lower() for p in parts[1:-1]]
-            
-            # 중간 영역에 차단 목록 정책(exe, bat 등)이 숨어있다면 우회 공격으로 간주하고 즉시 차단
             for mid_ext in middle_extensions:
                 if mid_ext in policy.blocked_extensions:
-                    status, risk, reason = 'BLOCKED', 'HIGH', 'Dangerous double extension detected (Spoofing Alert)'
-                    return ScanResult(status=status, risk_level=risk, blocked_reason=reason)
+                    return ScanResult(
+                        status='BLOCKED', 
+                        risk_level='HIGH', 
+                        blocked_reason='Dangerous double extension detected (Spoofing Alert)'
+                    )
 
-        # 3. 일반 단일 확장자 검사 (가장 뒤쪽 최종 확장자 기준)
+        # 4. 일반 단일 확장자 검사 (가장 뒤쪽 최종 확장자 기준)
         final_extension = parts[-1].lower()
         if final_extension in policy.blocked_extensions:
             status, risk, reason = 'BLOCKED', 'HIGH', 'Dangerous file extension detected'
@@ -346,18 +361,19 @@ def upload():
         if file:
             filename = secure_filename(file.filename)
             
-            # [2번 FileUpload 스펙 반영] 파일 정보 추출
             file_type = file.content_type  
             file.seek(0, os.SEEK_END)
             file_size = file.tell()        
             file.seek(0)                   
             
+            # FileUpload 객체 생성
             file_obj = FileUpload(filename, file_type, file_size)
 
             policy = SecurityPolicy()
-            # 🎯 업데이트된 이중 확장자 탐지 로직으로 정밀 보안 검사 수행
-            scan_result = SecurityScanService.evaluate(file_obj.file_name, policy)
-
+            # 🎯 여기서 'file_obj.file_type'을 반드시 전달해야 합니다!
+            scan_result = SecurityScanService.evaluate(file_obj.file_name, file_obj.file_type, policy)
+            
+            # ... (이후 저장 및 DB 기록 로직)
             if scan_result.status in ['WARNING', 'SAFE']:
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
